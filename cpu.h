@@ -3,12 +3,10 @@
 
 /*Instructions and opcodes*/
 
-#define LDA_IM	0xA9				/*Immediate addressing*/
-#define LDA_ZP	0xA5				/*Zero page addressing*/
+#define LDA_IM	0xA9				/*Load accumulator immediate addressing*/
+#define LDA_ZP	0xA5				/*Load accumulator zero page addressing*/
 
-#define LDA_AB	0xAD				/*Absolute addressing*/
-#define LDX_AB	0xAE				/*Absolute addressing*/
-#define LDY_AB	0xAC				/*Absolute addressing*/
+#define	JSR		0x20				/*Jump subroutine absolute addressing*/
 
 #include "typedefs.h"
 #include "memory.h"
@@ -40,7 +38,9 @@ extern struct CPU* CPU_power_on(void);
 extern void CPU_power_off(struct CPU * cpu);
 extern void CPU_reset(struct CPU * cpu);
 extern void CPU_status(struct CPU*);
-extern void CPU_exec(struct CPU * cpu, struct memory* mem, unsigned int cycles);
-static byte CPU_fetch(struct CPU * cpu, struct memory* mem, unsigned int *cycles);				/*Fetch instruction from memory*/
-static byte CPU_read(struct CPU * cpu, struct memory* mem, byte addr, unsigned int *cycles); 	/*Similar to fetch but doesn't increment program counter*/
+extern void CPU_exec(struct CPU * cpu, struct memory* mem, unsigned long long cycles);
+static byte CPU_fetch_byte(struct CPU * cpu, struct memory* mem, unsigned long long *cycles);				/*Fetch instruction(8bits) from program counter address*/
+static word CPU_fetch_word(struct CPU * cpu, struct memory* mem, unsigned long long *cycles);				/*Fetch 16bits from program counter address*/
+static byte CPU_read_byte(struct CPU * cpu, struct memory* mem, byte addr, unsigned long long *cycles); 	/*Read 8bits from memory address*/
+static void CPU_dec_cycle(unsigned long long *cycles);
 #endif

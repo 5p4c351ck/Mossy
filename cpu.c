@@ -51,23 +51,29 @@ void CPU_status(struct CPU* cpu){
 	printf("Flag N: %d\n", cpu->N);
 }
 
-void CPU_exec(struct CPU * cpu, struct memory* mem, unsigned int cycles){
+void CPU_exec(struct CPU * cpu, struct memory* mem, unsigned long long cycles){
 
 	while(cycles > 0){
 
-		byte inst = CPU_fetch(cpu, mem, &cycles);
+		byte inst = CPU_fetch_byte(cpu, mem, &cycles);
 		switch (inst)
 		{
 		case LDA_IM:
-			cpu->A = CPU_fetch(cpu, mem, &cycles);
+			cpu->A = CPU_fetch_byte(cpu, mem, &cycles);
 			cpu->Z = (cpu->A == 0);
 			cpu->N = (cpu->A & 0b10000000) > 0;
 			break;
 		case LDA_ZP:
-			byte zp_addr = CPU_fetch(cpu, mem, &cycles);
-			cpu->A = CPU_read(cpu, mem, zp_addr, &cycles);
+			byte zp_addr = CPU_fetch_byte(cpu, mem, &cycles);
+			cpu->A = CPU_read_byte(cpu, mem, zp_addr, &cycles);
 			cpu->Z = (cpu->A == 0);
 			cpu->N = (cpu->A & 0b10000000) > 0;
+			break;
+		case JSR:
+			cpu->SP = (cpu->PC - 1);
+			CPU_dec_cycle(&cycles);
+			cpu->PC = CPU_fetch_word(cpu, mem, &cycles);
+			CPU_dec_cycle(&cycles);
 			break;
 		default:
 			break;
@@ -75,17 +81,36 @@ void CPU_exec(struct CPU * cpu, struct memory* mem, unsigned int cycles){
 	}
 }
 
-byte CPU_fetch(struct CPU * cpu, struct memory* mem, unsigned int *cycles){
+byte CPU_fetch_byte(struct CPU * cpu, struct memory* mem, unsigned long long *cycles){
 
 	byte inst = mem->cell[cpu->PC];
 	cpu->PC += 1;
-	(*cycles) -= 1;
+	CPU_dec_cycle(cycles);
 	return inst;
 }
 
-byte CPU_read(struct CPU * cpu, struct memory* mem, byte addr, unsigned int *cycles){
+static word CPU_fetch_word(struct CPU * cpu, struct memory* mem, unsigned long long *cycles){
+				
+	word data = mem->cell[cpu->PC];		/*6502 is little endian so this is the least significant byte*/
+	cpu->PC += 1;
+	CPU_dec_cycle(cycles);
+
+	data |= (mem->cell[cpu->PC] << 8);	/*6502 is little endian so this is the most significant byte*/
+	cpu->PC += 1;    
+	CPU_dec_cycle(cycles);
+	return data;
+
+}
+
+byte CPU_read_byte(struct CPU * cpu, struct memory* mem, byte addr, unsigned long long *cycles){
 
 	byte data = mem->cell[addr];
-	(*cycles) -= 1;
+	CPU_dec_cycle(cycles);
 	return data;
+}
+
+
+void CPU_dec_cycle(unsigned long long *cycles){
+
+	if ((*cycles)) (*cycles)--;
 }
