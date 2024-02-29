@@ -1,13 +1,6 @@
 #ifndef CPU_H
 #define CPU_H
 
-/*Instructions and opcodes*/
-
-#define LDA_IM	0xA9				/*Load accumulator immediate addressing*/
-#define LDA_ZP	0xA5				/*Load accumulator zero page addressing*/
-
-#define	JSR		0x20				/*Jump subroutine absolute addressing*/
-
 #include "typedefs.h"
 #include "memory.h"
 
@@ -31,6 +24,13 @@ byte V : 1; 						/*Overflow flag*/
 byte N : 1; 						/*Negative flag*/
 
 };
+/*Instructions and opcodes*/
+
+#define LDA_IM	0xA9				/*Load accumulator immediate addressing*/
+#define LDA_ZP	0xA5				/*Load accumulator zero page addressing*/
+
+#define	JSR		0x20				/*Jump subroutine absolute addressing*/
+
 
 /*CPU API*/
 

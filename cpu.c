@@ -2,6 +2,7 @@
 #include <stdlib.h>
 
 #include "cpu.h"
+#include "memory.h"
 
 struct CPU* CPU_power_on(void){
 
@@ -16,8 +17,8 @@ void CPU_power_off(struct CPU *cpu){
 
 void CPU_reset(struct CPU *cpu){
 
-	cpu->PC = 0x00;
-	cpu->SP = 0xFF;
+	cpu->PC = 0xAAFF;
+	cpu->SP = 0x00;
 
 	cpu->C = 0;
 	cpu->Z = 0;
@@ -70,10 +71,13 @@ void CPU_exec(struct CPU * cpu, struct memory* mem, unsigned long long cycles){
 			cpu->N = (cpu->A & 0b10000000) > 0;
 			break;
 		case JSR:
-			cpu->SP = (cpu->PC - 1);
+			byte low = ((cpu->PC - 1) & 0xFF);
+			byte high = ((cpu->PC - 1) >> 8);
+			CPU_dec_cycle(&cycles);
+			stack_push(cpu, mem, low);
+			stack_push(cpu, mem, high);
 			CPU_dec_cycle(&cycles);
 			cpu->PC = CPU_fetch_word(cpu, mem, &cycles);
-			CPU_dec_cycle(&cycles);
 			break;
 		default:
 			break;
