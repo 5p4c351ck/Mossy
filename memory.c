@@ -4,7 +4,7 @@
 #include "memory.h"
 #include "cpu.h"
 
-static int stack_rollback = 0;
+static int stack_rollback = 0;                                                      /*Flag for stack wrapping*/
 
 struct memory* init_mem(void){
 
@@ -17,15 +17,15 @@ void free_mem(struct memory* mem){
     free(mem);
 }
 
-extern void stack_push(struct CPU* cpu, struct memory* mem, byte data){
-        /*We account for the fixed high byte 0x01*/
+extern void stack_push(struct CPU* cpu, struct memory* mem, byte data){            /*Take into account the fixed high byte 0x01*/
+                                                                                     
     if(cpu->SP == 0x00) stack_rollback++;   
-    mem->cell[0x0100 + cpu->SP] = data;
+    mem->cell[0x0100 + cpu->SP] = data;                                           
     cpu->SP--;
 }
 
-extern byte stack_pop(struct CPU* cpu, struct memory* mem){
-        /*We account for the fixed high byte 0x01*/
+extern byte stack_pop(struct CPU* cpu, struct memory* mem){                        
+        
     if(cpu->SP == 0xFF && stack_rollback == 0){
             printf("Stack is empty\n");
     }

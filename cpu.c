@@ -4,6 +4,10 @@
 #include "cpu.h"
 #include "memory.h"
 
+
+static byte low;
+static byte high;
+
 struct CPU* CPU_power_on(void){
 
 	struct CPU *cpu = (struct CPU*)malloc(sizeof(*cpu));
@@ -54,7 +58,7 @@ void CPU_status(struct CPU* cpu){
 
 void CPU_exec(struct CPU * cpu, struct memory* mem, unsigned long long cycles){
 
-	while(cycles > 0){
+	while((cycles)){
 
 		byte inst = CPU_fetch_byte(cpu, mem, &cycles);
 		switch (inst)
@@ -71,13 +75,20 @@ void CPU_exec(struct CPU * cpu, struct memory* mem, unsigned long long cycles){
 			cpu->N = (cpu->A & 0b10000000) > 0;
 			break;
 		case JSR:
-			byte low = ((cpu->PC - 1) & 0xFF);
-			byte high = ((cpu->PC - 1) >> 8);
-			CPU_dec_cycle(&cycles);
+			CPU_dec_cycle(&cycles, 3);
+			low = ((cpu->PC + 1) & 0xFF);
+			high = ((cpu->PC + 1) >> 8);
 			stack_push(cpu, mem, low);
 			stack_push(cpu, mem, high);
-			CPU_dec_cycle(&cycles);
 			cpu->PC = CPU_fetch_word(cpu, mem, &cycles);
+			break;
+		case RTS:
+			CPU_dec_cycle(&cycles, 5);
+			high = stack_pop(cpu, mem);
+			low = stack_pop(cpu, mem);
+			cpu->PC = (high << 8);
+			cpu->PC |= low;
+			cpu->PC++;
 			break;
 		default:
 			break;
@@ -87,34 +98,42 @@ void CPU_exec(struct CPU * cpu, struct memory* mem, unsigned long long cycles){
 
 byte CPU_fetch_byte(struct CPU * cpu, struct memory* mem, unsigned long long *cycles){
 
+	CPU_dec_cycle(cycles, 1);
 	byte inst = mem->cell[cpu->PC];
 	cpu->PC += 1;
-	CPU_dec_cycle(cycles);
 	return inst;
 }
 
 word CPU_fetch_word(struct CPU * cpu, struct memory* mem, unsigned long long *cycles){
-				
+
+	CPU_dec_cycle(cycles, 2);		
 	word data = mem->cell[cpu->PC];		/*6502 is little endian so this is the least significant byte*/
 	cpu->PC += 1;
-	CPU_dec_cycle(cycles);
 
 	data |= (mem->cell[cpu->PC] << 8);	/*6502 is little endian so this is the most significant byte*/
 	cpu->PC += 1;    
-	CPU_dec_cycle(cycles);
 	return data;
 
 }
 
 byte CPU_read_byte(struct CPU * cpu, struct memory* mem, byte addr, unsigned long long *cycles){
 
+	CPU_dec_cycle(cycles, 1);
 	byte data = mem->cell[addr];
-	CPU_dec_cycle(cycles);
 	return data;
 }
 
+	/*
+		Checking whether or not there are enough cycles left to
+		finish an instruction before starting its execution
+	*/
 
-void CPU_dec_cycle(unsigned long long *cycles){
+void CPU_dec_cycle(unsigned long long *cycles, unsigned short dec){
 
-	if ((*cycles)) (*cycles)--;
+	if ((*cycles) > 0 && (*cycles) >= dec){
+		(*cycles)-= dec;
+	}
+	else {
+		exit(0);
+	}
 }
