@@ -8,7 +8,7 @@ static int stack_rollback = 0;
 
 struct memory* init_mem(void){
 
-    struct memory *mem = (struct memory*)malloc(sizeof(mem));
+    struct memory *mem = (struct memory*)malloc(sizeof(*mem));
     return mem;
 }
 

@@ -6,7 +6,7 @@
 
 struct CPU* CPU_power_on(void){
 
-	struct CPU *cpu = (struct CPU*)malloc(sizeof(cpu));
+	struct CPU *cpu = (struct CPU*)malloc(sizeof(*cpu));
 	return cpu;
 }
 
