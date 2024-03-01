@@ -17,8 +17,8 @@ void CPU_power_off(struct CPU *cpu){
 
 void CPU_reset(struct CPU *cpu){
 
-	cpu->PC = 0xAAFF;
-	cpu->SP = 0x00;
+	cpu->PC = 0x00;
+	cpu->SP = 0xFF;
 
 	cpu->C = 0;
 	cpu->Z = 0;
@@ -93,7 +93,7 @@ byte CPU_fetch_byte(struct CPU * cpu, struct memory* mem, unsigned long long *cy
 	return inst;
 }
 
-static word CPU_fetch_word(struct CPU * cpu, struct memory* mem, unsigned long long *cycles){
+word CPU_fetch_word(struct CPU * cpu, struct memory* mem, unsigned long long *cycles){
 				
 	word data = mem->cell[cpu->PC];		/*6502 is little endian so this is the least significant byte*/
 	cpu->PC += 1;

@@ -2,7 +2,7 @@
 #define CPU_H
 
 #include "typedefs.h"
-#include "memory.h"
+struct memory;
 
 struct CPU{
 

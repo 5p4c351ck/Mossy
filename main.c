@@ -13,13 +13,13 @@ int main(void){
 	CPU_reset(cpu);
 
 	mem->cell[0] = 0x20;
-	mem->cell[1] = 0xFF;
+	mem->cell[1] = 0x0A;
 	mem->cell[2] = 0x00;
 
-	mem->cell[255] = 0xA9;
-	mem->cell[256] = 0xFF;
+	mem->cell[10] = 0xA9;
+	mem->cell[11] = 0xFF;
 
-	CPU_exec(cpu, mem, 1000000);
+	CPU_exec(cpu, mem, 6);
 
 	CPU_status(cpu);
 
