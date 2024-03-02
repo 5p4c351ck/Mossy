@@ -5,6 +5,7 @@
 #include "memory.h"
 
 
+static byte zp_addr;
 static byte low;
 static byte high;
 
@@ -58,22 +59,11 @@ void CPU_status(struct CPU* cpu){
 
 void CPU_exec(struct CPU * cpu, struct memory* mem, unsigned long long cycles){
 
-	while((cycles)){
+	while(cycles){
 
 		byte inst = CPU_fetch_byte(cpu, mem, &cycles);
 		switch (inst)
 		{
-		case LDA_IM:
-			cpu->A = CPU_fetch_byte(cpu, mem, &cycles);
-			cpu->Z = (cpu->A == 0);
-			cpu->N = (cpu->A & 0b10000000) > 0;
-			break;
-		case LDA_ZP:
-			byte zp_addr = CPU_fetch_byte(cpu, mem, &cycles);
-			cpu->A = CPU_read_byte(cpu, mem, zp_addr, &cycles);
-			cpu->Z = (cpu->A == 0);
-			cpu->N = (cpu->A & 0b10000000) > 0;
-			break;
 		case JSR:
 			CPU_dec_cycle(&cycles, 3);
 			low = ((cpu->PC + 1) & 0xFF);
@@ -81,6 +71,42 @@ void CPU_exec(struct CPU * cpu, struct memory* mem, unsigned long long cycles){
 			stack_push(cpu, mem, low);
 			stack_push(cpu, mem, high);
 			cpu->PC = CPU_fetch_word(cpu, mem, &cycles);
+			break;
+		case LDA_IM:
+			cpu->A = CPU_fetch_byte(cpu, mem, &cycles);
+			cpu->Z = (cpu->A == 0);
+			cpu->N = (cpu->A & 0b10000000) > 0;
+			break;
+		case LDA_ZP:
+			zp_addr = CPU_fetch_byte(cpu, mem, &cycles);
+			cpu->A = CPU_read_byte(cpu, mem, zp_addr, &cycles);
+			cpu->Z = (cpu->A == 0);
+			cpu->N = (cpu->A & 0b10000000) > 0;
+			break;
+		case LDX_IM:
+			cpu->X = CPU_fetch_byte(cpu, mem, &cycles);
+			cpu->Z = (cpu->X == 0);
+			cpu->N = (cpu->X & 0b10000000) > 0;
+			break;
+		case LDX_ZP:
+			zp_addr = CPU_fetch_byte(cpu, mem, &cycles);
+			cpu->X = CPU_read_byte(cpu, mem, zp_addr, &cycles);
+			cpu->Z = (cpu->X == 0);
+			cpu->N = (cpu->X & 0b10000000) > 0;
+			break;
+		case LDY_IM:
+			cpu->Y = CPU_fetch_byte(cpu, mem, &cycles);
+			cpu->Z = (cpu->Y == 0);
+			cpu->N = (cpu->Y & 0b10000000) > 0;
+			break;
+		case LDY_ZP:
+			zp_addr = CPU_fetch_byte(cpu, mem, &cycles);
+			cpu->Y = CPU_read_byte(cpu, mem, zp_addr, &cycles);
+			cpu->Z = (cpu->Y == 0);
+			cpu->N = (cpu->Y & 0b10000000) > 0;
+			break;
+		case NOP:
+			CPU_dec_cycle(&cycles, 1);
 			break;
 		case RTS:
 			CPU_dec_cycle(&cycles, 5);
