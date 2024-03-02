@@ -40,7 +40,7 @@ void CPU_reset(struct CPU *cpu){
 	return;
 }
 
-void CPU_status(struct CPU* cpu){
+void CPU_state(struct CPU* cpu){
 
 	printf("\n---CPU STATUS---\n");
 	printf("Program counter: %d\n", cpu->PC);
@@ -60,10 +60,13 @@ void CPU_status(struct CPU* cpu){
 void CPU_exec(struct CPU * cpu, struct memory* mem, unsigned long long cycles){
 
 	while(cycles){
-
+		/*One machine cycle is always used to fetch the next instruction(byte) from memory*/
 		byte inst = CPU_fetch_byte(cpu, mem, &cycles);
 		switch (inst)
 		{
+		case JMP:
+			cpu->PC = CPU_fetch_word(cpu, mem, &cycles);
+			break;
 		case JSR:
 			CPU_dec_cycle(&cycles, 3);
 			low = ((cpu->PC + 1) & 0xFF);
@@ -130,6 +133,7 @@ byte CPU_fetch_byte(struct CPU * cpu, struct memory* mem, unsigned long long *cy
 	return inst;
 }
 
+/*Two machine cycles are used to fetch a word(16bits) from memory*/
 word CPU_fetch_word(struct CPU * cpu, struct memory* mem, unsigned long long *cycles){
 
 	CPU_dec_cycle(cycles, 2);		

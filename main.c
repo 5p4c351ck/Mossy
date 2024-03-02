@@ -12,13 +12,14 @@ int main(void){
 	CPU_reset(cpu);
 						/*Hardcoded program for debugging instructions*/
 
-	mem->cell[0] = 0xEA;
-	mem->cell[1] = 0xEA;
-	mem->cell[2] = 0xEA;
+	mem->cell[0] = 0x20;
+	mem->cell[1] = 0xA0;
 
-	CPU_exec(cpu, mem, 2);
+	mem->cell[160] = 0x60;
 
-	CPU_status(cpu);
+	CPU_exec(cpu, mem, 12);
+
+	CPU_state(cpu);
 
 	CPU_power_off(cpu);
 	free_mem(mem);
