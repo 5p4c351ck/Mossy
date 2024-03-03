@@ -60,12 +60,17 @@ byte N : 1; 						/*Negative flag*/
 /*CPU API*/
 
 extern struct CPU* CPU_power_on(void);
-extern void CPU_power_off(struct CPU * cpu);
-extern void CPU_reset(struct CPU * cpu);
-extern void CPU_state(struct CPU*);
-extern void CPU_exec(struct CPU * cpu, struct memory* mem, unsigned long long cycles);
-static byte CPU_fetch_byte(struct CPU * cpu, struct memory* mem, unsigned long long *cycles);				/*Fetch instruction(8bits) from program counter address*/
-static word CPU_fetch_word(struct CPU * cpu, struct memory* mem, unsigned long long *cycles);				/*Fetch 16bits from program counter address*/
-static byte CPU_read_byte(struct CPU * cpu, struct memory* mem, word addr, unsigned long long *cycles); 		/*Read 8bits from memory address*/
+extern void CPU_power_off(struct CPU *cpu);
+extern void CPU_reset(struct CPU *cpu);
+extern void CPU_state(struct CPU* cpu);
+extern void CPU_exec(struct CPU *cpu, struct memory *mem, unsigned long long cycles);
+static byte CPU_fetch_byte(struct CPU *cpu, struct memory *mem, unsigned long long *cycles);				/*Fetch instruction(8bits) from program counter address*/
+static word CPU_fetch_word(struct CPU *cpu, struct memory *mem, unsigned long long *cycles);				/*Fetch 16bits from program counter address*/
+static byte CPU_read_byte(struct CPU *cpu, struct memory *mem, word addr, unsigned long long *cycles); 		/*Read 8bits from memory address*/
+static void CPU_split_word(word value, byte *low, byte *high, unsigned long long *cycles);
+static void CPU_combine_bytes(word *value, byte low, byte high, unsigned long long *cycles);
+static void CPU_set_flag_z(struct CPU *cpu, byte value);
+static void CPU_set_flag_n(struct CPU *cpu, byte value);
+static void CPU_set_flag_c(struct CPU *cpu, byte value);
 extern void CPU_dec_cycle(unsigned long long *cycles, unsigned short dec);
 #endif
