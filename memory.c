@@ -17,15 +17,15 @@ void free_mem(struct memory* mem){
     free(mem);
 }
 
-extern void stack_push(struct CPU* cpu, struct memory* mem, byte data){            /*Take into account the fixed high byte 0x01*/
-                                                                                     
+extern void stack_push(struct CPU* cpu, struct memory* mem, byte data, unsigned long long *cycles){            /*Take into account the fixed high byte 0x01*/
+    CPU_dec_cycle(cycles, 1);                                                                                   
     if(cpu->SP == 0x00) stack_rollback++;   
     mem->cell[0x0100 + cpu->SP] = data;                                           
     cpu->SP--;
 }
 
-extern byte stack_pop(struct CPU* cpu, struct memory* mem){                        
-        
+extern byte stack_pop(struct CPU* cpu, struct memory* mem, unsigned long long *cycles){                        
+    CPU_dec_cycle(cycles, 1);    
     if(cpu->SP == 0xFF && stack_rollback == 0){
             printf("Stack is empty\n");
     }

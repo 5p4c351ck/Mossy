@@ -65,40 +65,69 @@ void CPU_exec(struct CPU * cpu, struct memory* mem, unsigned long long cycles){
 		byte inst = CPU_fetch_byte(cpu, mem, &cycles);
 		switch (inst)
 		{
+		case DEC_ZP:
+			zp_addr = CPU_fetch_byte(cpu, mem, &cycles);
+			CPU_dec_cycle(&cycles, 1);
+			mem->cell[zp_addr]--;
+			cpu->Z = (CPU_read_byte(cpu, mem, zp_addr, &cycles) == 0);
+			cpu->N = (CPU_read_byte(cpu, mem, zp_addr, &cycles) > 0);
+		break;
+
+		case DEC_AB:
+			ab_addr = CPU_fetch_word(cpu, mem, &cycles);
+			CPU_dec_cycle(&cycles, 1);
+			mem->cell[ab_addr]--;
+			cpu->Z = (CPU_read_byte(cpu, mem, ab_addr, &cycles) == 0);
+			cpu->N = (CPU_read_byte(cpu, mem, ab_addr, &cycles) & 0b10000000) > 0;
+		break;
+
+		case DEX:
+			CPU_dec_cycle(&cycles, 1);
+			cpu->X--;
+			cpu->Z = (cpu->X == 0);
+			cpu->N = (cpu->X & 0b10000000) > 0;
+		break;
+
+		case DEY:
+			CPU_dec_cycle(&cycles, 1);
+			cpu->Y--;
+			cpu->Z = (cpu->Y == 0);
+			cpu->N = (cpu->Y & 0b10000000) > 0;
+		break;
+
 		case EOR_IM:
 			cpu->A ^= CPU_fetch_byte(cpu, mem, &cycles);
 			cpu->Z = (cpu->A == 0);
 			cpu->N = (cpu->A & 0b10000000) > 0;
 		break;
 
+
 		case EOR_ZP:
-			CPU_dec_cycle(&cycles, 1);
-			cpu->A ^= mem->cell[CPU_fetch_byte(cpu, mem, &cycles)];
+			cpu->A ^= CPU_read_byte(cpu, mem, CPU_fetch_byte(cpu, mem, &cycles), &cycles);
 			cpu->Z = (cpu->A == 0);
 			cpu->N = (cpu->A & 0b10000000) > 0;
 		break;
 
 		case EOR_AB:
-			CPU_dec_cycle(&cycles, 1);
-			cpu->A ^= mem->cell[CPU_fetch_word(cpu, mem, &cycles)];
+			cpu->A ^= CPU_read_byte(cpu, mem, CPU_fetch_word(cpu, mem, &cycles), &cycles);
 			cpu->Z = (cpu->A == 0);
 			cpu->N = (cpu->A & 0b10000000) > 0;
 		break;
 
 		case INC_ZP:
-			CPU_dec_cycle(&cycles, 3);
 			zp_addr = CPU_fetch_byte(cpu, mem, &cycles);
+			CPU_dec_cycle(&cycles, 1);
 			mem->cell[zp_addr]++;   
-			cpu->Z = (mem->cell[zp_addr] == 0);
-			cpu->N = (mem->cell[zp_addr] & 0b10000000) > 0;
+			cpu->Z = (CPU_read_byte(cpu, mem, zp_addr, &cycles) == 0);
+			cpu->N = (CPU_read_byte(cpu, mem, zp_addr, &cycles) & 0b10000000) > 0;
 		break;
 
 		case INC_AB:
-			CPU_dec_cycle(&cycles, 3);
 			ab_addr = CPU_fetch_word(cpu, mem, &cycles);
+			CPU_dec_cycle(&cycles, 1);
 			mem->cell[ab_addr]++;
-			cpu->Z = (mem->cell[ab_addr] == 0);
-			cpu->N = (mem->cell[ab_addr] & 0b10000000) > 0;
+			cpu->Z = (CPU_read_byte(cpu, mem, ab_addr, &cycles) == 0);
+			cpu->N = (CPU_read_byte(cpu, mem, ab_addr, &cycles) & 0b10000000) > 0;
 		break;
 
 		case INX:
@@ -120,11 +149,11 @@ void CPU_exec(struct CPU * cpu, struct memory* mem, unsigned long long cycles){
 			break;
 
 		case JSR:
-			CPU_dec_cycle(&cycles, 3);
+			CPU_dec_cycle(&cycles, 1);
 			low = ((cpu->PC + 1) & 0xFF);
 			high = ((cpu->PC + 1) >> 8);
-			stack_push(cpu, mem, low);
-			stack_push(cpu, mem, high);
+			stack_push(cpu, mem, low, &cycles);
+			stack_push(cpu, mem, high, &cycles);
 			cpu->PC = CPU_fetch_word(cpu, mem, &cycles);
 			break;
 			
@@ -178,18 +207,18 @@ void CPU_exec(struct CPU * cpu, struct memory* mem, unsigned long long cycles){
 			zp_addr = CPU_fetch_byte(cpu, mem, &cycles);
 			CPU_dec_cycle(&cycles, 3);
 			cpu->N = 0;
-			cpu->C = mem->cell[zp_addr] & 0b00000001;
+			cpu->C = CPU_read_byte(cpu, mem, zp_addr, &cycles) & 0b00000001;
 			mem->cell[zp_addr] >>= 1;
-			cpu->Z = (mem->cell[zp_addr] == 0);
+			cpu->Z = (CPU_read_byte(cpu, mem, zp_addr, &cycles) == 0);
 			break;
 
 		case LSR_AB:
 			ab_addr = CPU_fetch_word(cpu, mem, &cycles);
 			CPU_dec_cycle(&cycles, 3);
 			cpu->N = 0;
-			cpu->C = mem->cell[ab_addr] & 0b00000001;
+			cpu->C = CPU_read_byte(cpu, mem, ab_addr, &cycles) & 0b00000001;
 			mem->cell[ab_addr] >>= 1;
-			cpu->Z = (mem->cell[ab_addr] == 0);
+			cpu->Z = (CPU_read_byte(cpu, mem, ab_addr, &cycles) == 0);
 			break;
 
 		case NOP:
@@ -197,9 +226,9 @@ void CPU_exec(struct CPU * cpu, struct memory* mem, unsigned long long cycles){
 			break;
 
 		case RTS:
-			CPU_dec_cycle(&cycles, 5);
-			high = stack_pop(cpu, mem);
-			low = stack_pop(cpu, mem);
+			high = stack_pop(cpu, mem, &cycles);
+			low = stack_pop(cpu, mem, &cycles);
+			CPU_dec_cycle(&cycles, 3);
 			cpu->PC = (high << 8);
 			cpu->PC |= low;
 			cpu->PC++;
@@ -231,7 +260,7 @@ word CPU_fetch_word(struct CPU * cpu, struct memory* mem, unsigned long long *cy
 
 }
 
-byte CPU_read_byte(struct CPU * cpu, struct memory* mem, byte addr, unsigned long long *cycles){
+byte CPU_read_byte(struct CPU * cpu, struct memory* mem, word addr, unsigned long long *cycles){
 
 	CPU_dec_cycle(cycles, 1);
 	byte data = mem->cell[addr];
