@@ -65,6 +65,26 @@ void CPU_exec(struct CPU * cpu, struct memory* mem, unsigned long long cycles){
 		byte inst = CPU_fetch_byte(cpu, mem, &cycles);
 		switch (inst)
 		{
+		case EOR_IM:
+			cpu->A ^= CPU_fetch_byte(cpu, mem, &cycles);
+			cpu->Z = (cpu->A == 0);
+			cpu->N = (cpu->A & 0b10000000) > 0;
+		break;
+
+		case EOR_ZP:
+			CPU_dec_cycle(&cycles, 1);
+			cpu->A ^= mem->cell[CPU_fetch_byte(cpu, mem, &cycles)];
+			cpu->Z = (cpu->A == 0);
+			cpu->N = (cpu->A & 0b10000000) > 0;
+		break;
+
+		case EOR_AB:
+			CPU_dec_cycle(&cycles, 1);
+			cpu->A ^= mem->cell[CPU_fetch_word(cpu, mem, &cycles)];
+			cpu->Z = (cpu->A == 0);
+			cpu->N = (cpu->A & 0b10000000) > 0;
+		break;
+
 		case INC_ZP:
 			CPU_dec_cycle(&cycles, 3);
 			zp_addr = CPU_fetch_byte(cpu, mem, &cycles);

@@ -10,29 +10,26 @@ int main(void){
 	struct CPU* cpu = CPU_power_on();	
 
 	CPU_reset(cpu);
+
 						/*Hardcoded program for debugging purposes*/
-
-
 	cpu->A = 0xFF;
 
-	mem->cell[0] = 0x4A;
+	mem->cell[0] = 0x49;
+	mem->cell[1] = 0x00;
 
-	mem->cell[1] = 0x46;
-	mem->cell[2] = 0x0A;
+	mem->cell[2] = 0x45;
+	mem->cell[3] = 0x0A;
 
-	mem->cell[3] = 0x4E;
-	mem->cell[4] = 0x0B;
-	mem->cell[5] = 0x00;
+	mem->cell[4] = 0x4D;
+	mem->cell[5] = 0x0B;
+	mem->cell[6] = 0x00;
 
-	mem->cell[10] = 0xFF;
-	mem->cell[11] = 0x00;
+	mem->cell[10] = 0x00;
+	mem->cell[11] = 0xF0;  
 	
-	CPU_exec(cpu, mem, 13);
+	CPU_exec(cpu, mem, 9);
 
 	CPU_state(cpu);
-
-	printf("0xA: %d\n", mem->cell[10]);
-	printf("0xB: %d\n", mem->cell[11]);
 
 	CPU_power_off(cpu);
 	free_mem(mem);

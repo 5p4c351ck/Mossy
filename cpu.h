@@ -8,6 +8,10 @@
 
 /*				OPCODE						DESCTRIPTION				ADDRESSING	 	 BYTES		  CYCLES			*/
 
+
+#define	EOR_IM	0x49					/*XOR Accumulator			 	Immediate		2 bytes		2 cycles*/
+#define	EOR_ZP	0x45					/*XOR Accumulator  				Zero page		2 bytes		3 cycles*/
+#define	EOR_AB	0x4D					/*XOR Accumulator 				Absolute		3 bytes		4 cycles*/
 #define	INC_ZP	0xE6					/*Increment Memory by One  		Zero page		2 bytes		5 cycles*/
 #define	INC_AB	0xEE					/*Increment Memory by One		Absolute 		3 bytes		6 cycles*/
 #define	INX		0xE8					/*Increment Index X by One 		Implied  		1 bytes		2 cycles*/
