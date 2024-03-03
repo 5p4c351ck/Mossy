@@ -7,16 +7,20 @@
 /*Instructions and opcodes*/
 
 
-#define	JMP		0x4C					/*Jump 			 		   absolute  addressing   3 bytes   3 cycles*/
-#define	JSR		0x20					/*Jump subroutine  		   absolute  addressing   3 bytes   6 cycles*/
-#define LDA_IM	0xA9					/*Load accumulator 		   immediate addressing   2 bytes   2 cycles*/
-#define LDA_ZP	0xA5					/*Load accumulator 		   zero page addressing   2 bytes   3 cycles*/
-#define LDX_IM	0xA2					/*Register X	 	       immediate addressing   2 bytes   3 cycles*/
-#define LDX_ZP	0xA6					/*Register X 	  		   zero page addressing   2 bytes   3 cycles*/
-#define LDY_IM	0xA0					/*Register Y	 	  	   immediate addressing   2 bytes   3 cycles*/
-#define LDY_ZP	0xA4					/*Register Y	 	  	   zero page addressing   2 bytes   3 cycles*/
-#define NOP		0xEA					/*No operation	   		   implied   addressing   1 byte    2 cycles*/
-#define RTS		0x60					/*Return from subroutine   implied   addressing   1 byte    6 cycles*/
+#define	INC_ZP	0xE6					/*Increment Memory by One  		zero page addressing	2 bytes		5 cycles*/
+#define	INC_AB	0xEE					/*Increment Memory by One		absolute  addressing	3 bytes		6 cycles*/
+#define	INX		0xE8					/*Increment Index X by One 		implied   addressing	1 bytes		2 cycles*/
+#define	INY		0xC8					/*Increment Index Y by One 		implied   addressing	1 bytes		2 cycles*/
+#define	JMP		0x4C					/*Jump 			 		   		absolute  addressing	3 bytes		3 cycles*/
+#define	JSR		0x20					/*Jump to subroutine  		   	absolute  addressing	3 bytes		6 cycles*/
+#define LDA_IM	0xA9					/*Load accumulator 		   		immediate addressing	2 bytes		2 cycles*/
+#define LDA_ZP	0xA5					/*Load accumulator 		   		zero page addressing	2 bytes		3 cycles*/
+#define LDX_IM	0xA2					/*Register X	 	       		immediate addressing	2 bytes		3 cycles*/
+#define LDX_ZP	0xA6					/*Register X 	  		   		zero page addressing	2 bytes		3 cycles*/
+#define LDY_IM	0xA0					/*Register Y	 	  	   		immediate addressing	2 bytes		3 cycles*/
+#define LDY_ZP	0xA4					/*Register Y	 	  	   		zero page addressing	2 bytes		3 cycles*/
+#define NOP		0xEA					/*No operation	   		   		implied   addressing	1 byte 		2 cycles*/
+#define RTS		0x60					/*Return from subroutine   		implied   addressing	1 byte 		6 cycles*/
 
 struct memory;
 

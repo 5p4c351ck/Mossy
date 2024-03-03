@@ -6,6 +6,7 @@
 
 
 static byte zp_addr;
+static word ab_addr;
 static byte low;
 static byte high;
 
@@ -64,6 +65,32 @@ void CPU_exec(struct CPU * cpu, struct memory* mem, unsigned long long cycles){
 		byte inst = CPU_fetch_byte(cpu, mem, &cycles);
 		switch (inst)
 		{
+		case INC_ZP:
+			CPU_dec_cycle(&cycles, 3);
+			zp_addr = CPU_fetch_byte(cpu, mem, &cycles);
+			mem->cell[zp_addr]++;   
+			cpu->Z = (mem->cell[zp_addr] == 0);
+			cpu->N = (mem->cell[zp_addr] & 0b10000000) > 0;
+		break;
+		case INC_AB:
+			CPU_dec_cycle(&cycles, 3);
+			ab_addr = CPU_fetch_word(cpu, mem, &cycles);
+			mem->cell[ab_addr]++;
+			cpu->Z = (mem->cell[ab_addr] == 0);
+			cpu->N = (mem->cell[ab_addr] & 0b10000000) > 0;
+		break;
+		case INX:
+			CPU_dec_cycle(&cycles, 1);
+			cpu->X++;
+			cpu->Z = (cpu->X == 0);
+			cpu->N = (cpu->X & 0b10000000) > 0;
+		break;
+		case INY:
+			CPU_dec_cycle(&cycles, 1);
+			cpu->Y++;
+			cpu->Z = (cpu->Y == 0);
+			cpu->N = (cpu->Y & 0b10000000) > 0;
+		break;
 		case JMP:
 			cpu->PC = CPU_fetch_word(cpu, mem, &cycles);
 			break;
