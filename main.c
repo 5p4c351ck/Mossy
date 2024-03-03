@@ -12,19 +12,27 @@ int main(void){
 	CPU_reset(cpu);
 						/*Hardcoded program for debugging purposes*/
 
-	mem->cell[0] = 0xE6;
-	mem->cell[1] = 0xA0;
-	mem->cell[2] = 0xEE;
-	mem->cell[3] = 0xB0;
-	mem->cell[4] = 0x00;
 
+	cpu->A = 0xFF;
+
+	mem->cell[0] = 0x4A;
+
+	mem->cell[1] = 0x46;
+	mem->cell[2] = 0x0A;
+
+	mem->cell[3] = 0x4E;
+	mem->cell[4] = 0x0B;
+	mem->cell[5] = 0x00;
+
+	mem->cell[10] = 0xFF;
+	mem->cell[11] = 0x00;
 	
-	CPU_exec(cpu, mem, 11);
+	CPU_exec(cpu, mem, 13);
 
 	CPU_state(cpu);
 
-	printf("%d\n", mem->cell[160]);
-	printf("%d\n", mem->cell[176]);
+	printf("0xA: %d\n", mem->cell[10]);
+	printf("0xB: %d\n", mem->cell[11]);
 
 	CPU_power_off(cpu);
 	free_mem(mem);
