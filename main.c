@@ -6,7 +6,7 @@
 
 int main(void){
 
-	struct memory* mem = init_mem();
+	struct memory* mem = init_memory();
 	struct CPU* cpu = CPU_power_on();	
 
 	CPU_reset(cpu);
@@ -32,7 +32,7 @@ int main(void){
 	CPU_state(cpu);
 
 	CPU_power_off(&cpu);
-	free_mem(&mem);
+	free_memory(&mem);
 
 	return 0;
 }

@@ -14,8 +14,8 @@ struct memory{
 
 /*Memory API*/
 
-extern struct memory* init_mem(void);
-extern void free_mem(struct memory** mem);
+extern struct memory* init_memory(void);
+extern void free_memory(struct memory** mem);
 extern void stack_push(struct CPU* cpu, struct memory* mem, byte data, unsigned long long *cycles);
 extern byte stack_pop(struct CPU*, struct memory* mem, unsigned long long *cycles);
 

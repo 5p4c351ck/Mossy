@@ -12,7 +12,7 @@ static byte high;
 
 struct CPU* CPU_power_on(void){
 
-	struct CPU *cpu = (struct CPU*)malloc(sizeof(*cpu));
+	struct CPU *cpu = malloc(sizeof(*cpu));
 	if (cpu != NULL){
 		return cpu;
 	}

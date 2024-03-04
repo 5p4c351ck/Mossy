@@ -12,9 +12,9 @@ static const word intenal_stack_top = fixed_high + stack_top;                   
 static const word intenal_stack_bottom = fixed_high + stack_bottom;                        /*The actual bottom memory address of the stack*/
 static int stack_rollback = 0;                                                             /*Flag for stack wrapping*/
 
-struct memory* init_mem(void){
+struct memory* init_memory(void){
 
-    struct memory *mem = (struct memory*)malloc(sizeof(*mem));
+    struct memory *mem = malloc(sizeof(*mem));
     if (mem != NULL){
         return mem;
     }
@@ -24,7 +24,7 @@ struct memory* init_mem(void){
     }
 }
 
-void free_mem(struct memory** mem){
+void free_memory(struct memory** mem){
 
     free((*mem));
     (*mem) = NULL;
