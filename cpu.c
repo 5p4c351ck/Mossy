@@ -72,6 +72,47 @@ void CPU_exec(struct CPU * cpu, struct memory* mem, unsigned long long cycles){
 		byte inst = CPU_fetch_byte(cpu, mem, &cycles);
 		switch (inst)
 		{
+		case CPY_IM:
+			low = CPU_fetch_byte(cpu, mem, &cycles);
+			high = cpu->Y - low; 
+			if (cpu->Y >= low){
+				cpu->C = 1;
+			}
+			else{
+				cpu->C = 0;
+			}
+			CPU_set_flag_z(cpu, high);
+			CPU_set_flag_n(cpu, high);
+		break;
+
+		case CPY_ZP:
+		zp_addr = CPU_fetch_byte(cpu, mem, &cycles);
+		low = CPU_read_byte(cpu, mem, zp_addr, &cycles);
+		high = cpu->Y - low; 
+			if (cpu->Y >= low){
+				cpu->C = 1;
+			}
+			else{
+				cpu->C = 0;
+			}
+			CPU_set_flag_z(cpu, high);
+			CPU_set_flag_n(cpu, high);
+		break;
+
+		case CPY_AB:
+		ab_addr = CPU_fetch_word(cpu, mem, &cycles);
+		low = CPU_read_byte(cpu, mem, ab_addr, &cycles);
+		high = cpu->Y - low; 
+			if (cpu->Y >= low){
+				cpu->C = 1;
+			}
+			else{
+				cpu->C = 0;
+			}
+			CPU_set_flag_z(cpu, high);
+			CPU_set_flag_n(cpu, high);
+		break;
+
 		case DEC_ZP:
 			zp_addr = CPU_fetch_byte(cpu, mem, &cycles);
 			CPU_dec_cycle(&cycles, 1);
@@ -233,8 +274,8 @@ void CPU_exec(struct CPU * cpu, struct memory* mem, unsigned long long cycles){
 		case RTS:
 			high = stack_pop(cpu, mem, &cycles);
 			low = stack_pop(cpu, mem, &cycles);
-			CPU_dec_cycle(&cycles, 1);
 			CPU_combine_bytes(&cpu->PC, low, high, &cycles);
+			CPU_dec_cycle(&cycles, 1);
 			cpu->PC++;
 			break;
 		default:

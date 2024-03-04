@@ -8,7 +8,9 @@
 
 /*				OPCODE			DESCTRIPTION				ADDRESSING	 	 BYTES		  CYCLES			*/
 
-
+#define	CPY_IM	0xC0		/*Compare Memory and Index Y	Immediate		2 bytes		2 cycles*/
+#define	CPY_ZP	0xC4		/*Compare Memory and Index Y	Zero page		2 bytes		3 cycles*/
+#define	CPY_AB	0xCC		/*Compare Memory and Index Y	Absolute		3 bytes		4 cycles*/
 #define	DEC_ZP	0xC6		/*Decrement Memory by One		Zero page		2 bytes		5 cycles*/
 #define	DEC_AB	0xCE		/*Decrement Memory by One		Absolute		3 bytes		6 cycles*/
 #define	DEX		0xCA		/*Decrement Index X by One		Implied			1 bytes		2 cycles*/
@@ -64,6 +66,9 @@ extern void CPU_power_off(struct CPU **cpu);
 extern void CPU_reset(struct CPU *cpu);
 extern void CPU_state(struct CPU* cpu);
 extern void CPU_exec(struct CPU *cpu, struct memory *mem, unsigned long long cycles);
+
+/*CPU API Internal subroutines(not to be called manually)*/
+
 static byte CPU_fetch_byte(struct CPU *cpu, struct memory *mem, unsigned long long *cycles);				/*Fetch instruction(8bits) from program counter address*/
 static word CPU_fetch_word(struct CPU *cpu, struct memory *mem, unsigned long long *cycles);				/*Fetch 16bits from program counter address*/
 static byte CPU_read_byte(struct CPU *cpu, struct memory *mem, word addr, unsigned long long *cycles); 		/*Read 8bits from memory address*/
