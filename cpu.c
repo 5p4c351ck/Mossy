@@ -75,14 +75,7 @@ void CPU_exec(struct CPU * cpu, struct memory* mem, unsigned long long cycles){
 		case CPY_IM:
 			low = CPU_fetch_byte(cpu, mem, &cycles);
 			high = cpu->Y - low; 
-			if (cpu->Y >= low){
-				cpu->C = 1;
-			}
-			else{
-				cpu->C = 0;
-			}
-			CPU_set_flag_z(cpu, high);
-			CPU_set_flag_n(cpu, high);
+			
 		break;
 
 		case CPY_ZP:
@@ -148,7 +141,6 @@ void CPU_exec(struct CPU * cpu, struct memory* mem, unsigned long long cycles){
 			CPU_set_flag_z(cpu, cpu->A);
 			CPU_set_flag_n(cpu, cpu->A);
 		break;
-
 
 		case EOR_ZP:
 			cpu->A ^= CPU_read_byte(cpu, mem, CPU_fetch_byte(cpu, mem, &cycles), &cycles);
@@ -243,28 +235,22 @@ void CPU_exec(struct CPU * cpu, struct memory* mem, unsigned long long cycles){
 		/*LSR always sets the N flag to 0 so we dont need to use a machine cycle to check*/
 		case LSR_A:
 			CPU_dec_cycle(&cycles, 1);
-			CPU_set_flag_c(cpu, cpu->A);
+			CPU_set_flags(cpu, inst, cpu->A);
 			cpu->A >>= 1;
-			CPU_set_flag_z(cpu, cpu->A);
-			cpu->N = 0;
 			break;
 
 		case LSR_ZP:
 			zp_addr = CPU_fetch_byte(cpu, mem, &cycles);
-			CPU_dec_cycle(&cycles, 1);
-			CPU_set_flag_c(cpu, CPU_read_byte(cpu, mem, zp_addr, &cycles));
+			CPU_dec_cycle(&cycles, 2);
+			CPU_set_flags(cpu, inst, CPU_read_byte(cpu, mem, zp_addr, &cycles));
 			mem->cell[zp_addr] >>= 1;
-			cpu->N = 0;
-			CPU_set_flag_z(cpu, CPU_read_byte(cpu, mem, zp_addr, &cycles));
 			break;
 
 		case LSR_AB:
 			ab_addr = CPU_fetch_word(cpu, mem, &cycles);
-			CPU_dec_cycle(&cycles, 1);
-			CPU_set_flag_c(cpu, CPU_read_byte(cpu, mem, ab_addr, &cycles));
+			CPU_dec_cycle(&cycles, 2);
+			CPU_set_flags(cpu, inst, CPU_read_byte(cpu, mem, ab_addr, &cycles));
 			mem->cell[ab_addr] >>= 1;
-			cpu->N = 0;
-			CPU_set_flag_z(cpu, CPU_read_byte(cpu, mem, ab_addr, &cycles));
 			break;
 
 		case NOP:
@@ -285,7 +271,6 @@ void CPU_exec(struct CPU * cpu, struct memory* mem, unsigned long long cycles){
 }
 
 byte CPU_fetch_byte(struct CPU * cpu, struct memory* mem, unsigned long long *cycles){
-
 	CPU_dec_cycle(cycles, 1);
 	byte inst = mem->cell[cpu->PC];
 	cpu->PC += 1;
@@ -294,7 +279,6 @@ byte CPU_fetch_byte(struct CPU * cpu, struct memory* mem, unsigned long long *cy
 
 /*Two machine cycles are used to fetch a word(16bits) from memory*/
 word CPU_fetch_word(struct CPU * cpu, struct memory* mem, unsigned long long *cycles){
-
 	CPU_dec_cycle(cycles, 2);		
 	word data = mem->cell[cpu->PC];		/*6502 is little endian so this is the least significant byte*/
 	cpu->PC += 1;
@@ -306,21 +290,18 @@ word CPU_fetch_word(struct CPU * cpu, struct memory* mem, unsigned long long *cy
 }
 
 byte CPU_read_byte(struct CPU * cpu, struct memory* mem, word addr, unsigned long long *cycles){
-
 	CPU_dec_cycle(cycles, 1);
 	byte data = mem->cell[addr];
 	return data;
 }
 
 void CPU_split_word(word value, byte *low, byte *high, unsigned long long *cycles){
-
 	CPU_dec_cycle(cycles, 1);
 	(*low) = ((value) & 0xFF);
 	(*high) = ((value) >> 8);
 }
 
 void CPU_combine_bytes(word *value, byte low, byte high, unsigned long long *cycles){
-
 	CPU_dec_cycle(cycles, 2);
 	(*value) = (high << 8);
 	(*value) |= low;
@@ -328,18 +309,54 @@ void CPU_combine_bytes(word *value, byte low, byte high, unsigned long long *cyc
 }
 
 static void CPU_set_flag_z(struct CPU *cpu, byte value){
-	
 	if (cpu != NULL) cpu->Z = (value == 0);
 }
 
 static void CPU_set_flag_n(struct CPU *cpu, byte value){
-
 	if (cpu != NULL) cpu->N = (value & 0b10000000 > 0);
 }
 
-static void CPU_set_flag_c(struct CPU *cpu, byte value){
-	
+static void CPU_set_flag_c_carry(struct CPU *cpu, byte value){
 	if (cpu != NULL) cpu->C = (value & 0b00000001);
+}
+
+static void CPU_set_flag_c_borrow(struct CPU *cpu, byte value){
+	if (cpu != NULL){
+		if (cpu->Y >= value){
+				cpu->C = 1;
+			}
+			else{
+				cpu->C = 0;
+			}
+	
+	}
+}
+
+static void CPU_set_flags(struct CPU *cpu, byte inst, byte value){
+	if (inst == CPY_IM && inst == CPY_ZP && inst == CPY_AB){
+		CPU_set_flag_c_borrow(cpu, value);
+		CPU_set_flag_z(cpu, value);
+		CPU_set_flag_n(cpu, value);
+	}
+	else if (inst == DEC_ZP && inst == DEC_AB &&
+			 inst == DEX	&& inst == DEY    &&
+			 inst == EOR_IM && inst == EOR_ZP &&
+			 inst == EOR_AB && inst == INC_ZP && 
+			 inst == INC_AB && inst == INX 	  && 
+			 inst == INY    && inst == LDA_IM &&
+			 inst == LDA_ZP && inst == LDX_IM && 
+			 inst == LDX_ZP && inst == LDY_IM && 
+			 inst == LDY_ZP)
+	{
+		CPU_set_flag_z(cpu, value);
+		CPU_set_flag_n(cpu, value);
+	}
+	else if (inst == LSR_A  && inst == LSR_ZP && inst == LSR_AB ){
+		CPU_set_flag_c_carry(cpu, value);
+		cpu->N = 0;
+		value >>= 8;
+		CPU_set_flag_z(cpu, value);
+	}
 }
 
 	/*
@@ -348,7 +365,6 @@ static void CPU_set_flag_c(struct CPU *cpu, byte value){
 	*/
 
 void CPU_dec_cycle(unsigned long long *cycles, unsigned short dec){
-
 	if ((*cycles) > 0 && (*cycles) >= dec){
 		(*cycles)-= dec;
 	}
