@@ -13,11 +13,18 @@ static byte high;
 struct CPU* CPU_power_on(void){
 
 	struct CPU *cpu = (struct CPU*)malloc(sizeof(*cpu));
-	return cpu;
+	if (cpu != NULL){
+		return cpu;
+	}
+	else{
+		/*Handle error if needed*/
+		return NULL;
+	}
 }
 
 void CPU_power_off(struct CPU *cpu){
 	free(cpu);
+	cpu = NULL;
 	return;
 }
 
