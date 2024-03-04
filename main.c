@@ -31,8 +31,8 @@ int main(void){
 
 	CPU_state(cpu);
 
-	CPU_power_off(cpu);
-	free_mem(mem);
+	CPU_power_off(&cpu);
+	free_mem(&mem);
 
 	return 0;
 }
