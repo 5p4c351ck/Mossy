@@ -24,10 +24,10 @@ struct memory* init_mem(void){
     }
 }
 
-void free_mem(struct memory* mem){
+void free_mem(struct memory** mem){
 
-    free(mem);
-    mem = NULL;
+    free((*mem));
+    (*mem) = NULL;
 }
 
 /*

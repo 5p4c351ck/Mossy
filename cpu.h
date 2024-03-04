@@ -60,7 +60,7 @@ byte N : 1; 						/*Negative flag*/
 /*CPU API*/
 
 extern struct CPU* CPU_power_on(void);
-extern void CPU_power_off(struct CPU *cpu);
+extern void CPU_power_off(struct CPU **cpu);
 extern void CPU_reset(struct CPU *cpu);
 extern void CPU_state(struct CPU* cpu);
 extern void CPU_exec(struct CPU *cpu, struct memory *mem, unsigned long long cycles);

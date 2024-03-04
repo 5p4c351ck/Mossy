@@ -22,9 +22,9 @@ struct CPU* CPU_power_on(void){
 	}
 }
 
-void CPU_power_off(struct CPU *cpu){
-	free(cpu);
-	cpu = NULL;
+void CPU_power_off(struct CPU **cpu){
+	free((*cpu));
+	(*cpu) = NULL;
 	return;
 }
 
