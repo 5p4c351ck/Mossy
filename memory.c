@@ -3,6 +3,7 @@
 
 #include "memory.h"
 #include "cpu.h"
+#include "logging.h"
 
 
 static const byte stack_top = 0xFF;                                                        /*The address at the top of the stack*/
@@ -44,7 +45,7 @@ extern void stack_push(struct CPU* cpu, struct memory* mem, byte data, unsigned 
     cpu->SP--;
     }
     else{
-        exit(0);
+        exit_and_save_status(cpu, OUFOFBOUNDSSTACK);
     }
 }
 
@@ -62,6 +63,6 @@ extern byte stack_pop(struct CPU* cpu, struct memory* mem, unsigned long long *c
     }
 }
 else{
-    exit(0);
+    exit_and_save_status(cpu, OUFOFBOUNDSSTACK);
 }
 }

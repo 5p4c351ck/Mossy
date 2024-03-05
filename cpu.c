@@ -3,6 +3,7 @@
 
 #include "cpu.h"
 #include "memory.h"
+#include "logging.h"
 
 
 static byte zp_addr;
@@ -237,14 +238,20 @@ void CPU_exec(struct CPU * cpu, struct memory* mem, unsigned long long cycles){
 }
 
 byte CPU_fetch_byte(struct CPU * cpu, struct memory* mem, unsigned long long *cycles){
+	if (cpu->PC >= 0 && cpu->PC <= sizeof(mem->cell)){
 	CPU_dec_cycle(cycles, 1);
 	byte inst = mem->cell[cpu->PC];
 	cpu->PC += 1;
 	return inst;
+	}
+	else{
+		exit_and_save_status(cpu, OUTOFBOUNDSMEM);
+	}
 }
 
 /*Two machine cycles are used to fetch a word(16bits) from memory*/
 word CPU_fetch_word(struct CPU * cpu, struct memory* mem, unsigned long long *cycles){
+	if (cpu->PC >= 0 && cpu->PC <= sizeof(mem->cell)){
 	CPU_dec_cycle(cycles, 2);		
 	word data = mem->cell[cpu->PC];		/*6502 is little endian so this is the least significant byte*/
 	cpu->PC += 1;
@@ -252,13 +259,21 @@ word CPU_fetch_word(struct CPU * cpu, struct memory* mem, unsigned long long *cy
 	data |= (mem->cell[cpu->PC] << 8);	/*6502 is little endian so this is the most significant byte*/
 	cpu->PC += 1;    
 	return data;
-
+	}
+	else{
+		exit_and_save_status(cpu, OUTOFBOUNDSMEM);
+	}
 }
 
 byte CPU_read_byte(struct CPU * cpu, struct memory* mem, word addr, unsigned long long *cycles){
+	if (cpu->PC >= 0 && cpu->PC <= sizeof(mem->cell)){
 	CPU_dec_cycle(cycles, 1);
 	byte data = mem->cell[addr];
 	return data;
+	}
+	else{
+		exit_and_save_status(cpu, OUTOFBOUNDSMEM);
+	}
 }
 
 void CPU_split_word(word value, byte *low, byte *high, unsigned long long *cycles){
