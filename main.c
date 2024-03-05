@@ -15,7 +15,7 @@ int main(void){
 	cpu->Y = 0xFF;
 
 	mem->cell[0] = 0xC0;
-	mem->cell[1] = 0x0A;
+	mem->cell[1] = 0xFF;
 
 	CPU_exec(cpu, mem, 2);
 

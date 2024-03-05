@@ -74,114 +74,86 @@ void CPU_exec(struct CPU * cpu, struct memory* mem, unsigned long long cycles){
 		{
 		case CPY_IM:
 			low = CPU_fetch_byte(cpu, mem, &cycles);
-			high = cpu->Y - low; 
-			
+			CPU_set_flags(cpu, inst, low);
 		break;
 
 		case CPY_ZP:
-		zp_addr = CPU_fetch_byte(cpu, mem, &cycles);
-		low = CPU_read_byte(cpu, mem, zp_addr, &cycles);
-		high = cpu->Y - low; 
-			if (cpu->Y >= low){
-				cpu->C = 1;
-			}
-			else{
-				cpu->C = 0;
-			}
-			CPU_set_flag_z(cpu, high);
-			CPU_set_flag_n(cpu, high);
+			zp_addr = CPU_fetch_byte(cpu, mem, &cycles);
+			low = CPU_read_byte(cpu, mem, zp_addr, &cycles);
+			CPU_set_flags(cpu, inst, low);
 		break;
 
 		case CPY_AB:
-		ab_addr = CPU_fetch_word(cpu, mem, &cycles);
-		low = CPU_read_byte(cpu, mem, ab_addr, &cycles);
-		high = cpu->Y - low; 
-			if (cpu->Y >= low){
-				cpu->C = 1;
-			}
-			else{
-				cpu->C = 0;
-			}
-			CPU_set_flag_z(cpu, high);
-			CPU_set_flag_n(cpu, high);
+			ab_addr = CPU_fetch_word(cpu, mem, &cycles);
+			low = CPU_read_byte(cpu, mem, ab_addr, &cycles);
+			CPU_set_flags(cpu, inst, low);
 		break;
 
 		case DEC_ZP:
 			zp_addr = CPU_fetch_byte(cpu, mem, &cycles);
-			CPU_dec_cycle(&cycles, 1);
+			CPU_dec_cycle(&cycles, 2);
 			mem->cell[zp_addr]--;
-			CPU_set_flag_z(cpu, CPU_read_byte(cpu, mem, zp_addr, &cycles));
-			CPU_set_flag_n(cpu, CPU_read_byte(cpu, mem, zp_addr, &cycles));
+			CPU_set_flags(cpu, inst, CPU_read_byte(cpu, mem, zp_addr, &cycles));
 		break;
 
 		case DEC_AB:
 			ab_addr = CPU_fetch_word(cpu, mem, &cycles);
-			CPU_dec_cycle(&cycles, 1);
+			CPU_dec_cycle(&cycles, 2);
 			mem->cell[ab_addr]--;
-			CPU_set_flag_z(cpu, CPU_read_byte(cpu, mem, ab_addr, &cycles));
-			CPU_set_flag_n(cpu, CPU_read_byte(cpu, mem, ab_addr, &cycles));
+			CPU_set_flags(cpu, inst, CPU_read_byte(cpu, mem, ab_addr, &cycles));
 		break;
 
 		case DEX:
 			CPU_dec_cycle(&cycles, 1);
 			cpu->X--;
-			CPU_set_flag_z(cpu, cpu->X);
-			CPU_set_flag_n(cpu, cpu->X);
+			CPU_set_flags(cpu, inst, cpu->X);
 		break;
 
 		case DEY:
 			CPU_dec_cycle(&cycles, 1);
 			cpu->Y--;
-			CPU_set_flag_z(cpu, cpu->Y);
-			CPU_set_flag_n(cpu, cpu->Y);
+			CPU_set_flags(cpu, inst, cpu->Y);
 		break;
 
 		case EOR_IM:
 			cpu->A ^= CPU_fetch_byte(cpu, mem, &cycles);
-			CPU_set_flag_z(cpu, cpu->A);
-			CPU_set_flag_n(cpu, cpu->A);
+			CPU_set_flags(cpu, inst, cpu->A);
 		break;
 
 		case EOR_ZP:
 			cpu->A ^= CPU_read_byte(cpu, mem, CPU_fetch_byte(cpu, mem, &cycles), &cycles);
-			CPU_set_flag_z(cpu, cpu->A);
-			CPU_set_flag_n(cpu, cpu->A);
+			CPU_set_flags(cpu, inst, cpu->A);
 		break;
 
 		case EOR_AB:
 			cpu->A ^= CPU_read_byte(cpu, mem, CPU_fetch_word(cpu, mem, &cycles), &cycles);
-			CPU_set_flag_z(cpu, cpu->A);
-			CPU_set_flag_n(cpu, cpu->A);
+			CPU_set_flags(cpu, inst, cpu->A);
 		break;
 
 		case INC_ZP:
 			zp_addr = CPU_fetch_byte(cpu, mem, &cycles);
 			CPU_dec_cycle(&cycles, 1);
 			mem->cell[zp_addr]++;   
-			CPU_set_flag_z(cpu, CPU_read_byte(cpu, mem, zp_addr, &cycles));
-			CPU_set_flag_n(cpu, CPU_read_byte(cpu, mem, zp_addr, &cycles));
+			CPU_set_flags(cpu, inst, CPU_read_byte(cpu, mem, zp_addr, &cycles));
 		break;
 
 		case INC_AB:
 			ab_addr = CPU_fetch_word(cpu, mem, &cycles);
 			CPU_dec_cycle(&cycles, 1);
 			mem->cell[ab_addr]++;
-			CPU_set_flag_z(cpu, CPU_read_byte(cpu, mem, ab_addr, &cycles));
-			CPU_set_flag_n(cpu, CPU_read_byte(cpu, mem, ab_addr, &cycles));
+			CPU_set_flags(cpu, inst, CPU_read_byte(cpu, mem, ab_addr, &cycles));
 		break;
 
 		case INX:
 			CPU_dec_cycle(&cycles, 1);
 			cpu->X++;
-			CPU_set_flag_z(cpu, cpu->X);
-			CPU_set_flag_n(cpu, cpu->X);
+			CPU_set_flags(cpu, inst, cpu->X);
 		break;
 
 		case INY:
 			CPU_dec_cycle(&cycles, 1);
 			cpu->Y++;
-			CPU_set_flag_z(cpu, cpu->Y);
-			CPU_set_flag_n(cpu, cpu->Y);
+			CPU_set_flags(cpu, inst, cpu->Y);
 		break;
 
 		case JMP:
@@ -197,40 +169,34 @@ void CPU_exec(struct CPU * cpu, struct memory* mem, unsigned long long cycles){
 			
 		case LDA_IM:
 			cpu->A = CPU_fetch_byte(cpu, mem, &cycles);
-			CPU_set_flag_z(cpu, cpu->A);
-			CPU_set_flag_n(cpu, cpu->A);
+			CPU_set_flags(cpu, inst, cpu->A);
 			break;
 		case LDA_ZP:
 			zp_addr = CPU_fetch_byte(cpu, mem, &cycles);
 			cpu->A = CPU_read_byte(cpu, mem, zp_addr, &cycles);
-			CPU_set_flag_z(cpu, cpu->A);
-			CPU_set_flag_n(cpu, cpu->A);
+			CPU_set_flags(cpu, inst, cpu->A);
 			break;
 
 		case LDX_IM:
 			cpu->X = CPU_fetch_byte(cpu, mem, &cycles);
-			CPU_set_flag_z(cpu, cpu->X);
-			CPU_set_flag_n(cpu, cpu->X);
+			CPU_set_flags(cpu, inst, cpu->X);
 			break;
 			
 		case LDX_ZP:
 			zp_addr = CPU_fetch_byte(cpu, mem, &cycles);
 			cpu->X = CPU_read_byte(cpu, mem, zp_addr, &cycles);
-			CPU_set_flag_z(cpu, cpu->X);
-			CPU_set_flag_n(cpu, cpu->X);
+			CPU_set_flags(cpu, inst, cpu->X);
 			break;
 
 		case LDY_IM:
 			cpu->Y = CPU_fetch_byte(cpu, mem, &cycles);
-			CPU_set_flag_z(cpu, cpu->Y);
-			CPU_set_flag_n(cpu, cpu->Y);
+			CPU_set_flags(cpu, inst, cpu->Y);
 			break;
 
 		case LDY_ZP:
 			zp_addr = CPU_fetch_byte(cpu, mem, &cycles);
 			cpu->Y = CPU_read_byte(cpu, mem, zp_addr, &cycles);
-			CPU_set_flag_z(cpu, cpu->Y);
-			CPU_set_flag_n(cpu, cpu->Y);
+			CPU_set_flags(cpu, inst, cpu->Y);
 			break;
 		/*LSR always sets the N flag to 0 so we dont need to use a machine cycle to check*/
 		case LSR_A:
@@ -333,25 +299,26 @@ static void CPU_set_flag_c_borrow(struct CPU *cpu, byte value){
 }
 
 static void CPU_set_flags(struct CPU *cpu, byte inst, byte value){
-	if (inst == CPY_IM && inst == CPY_ZP && inst == CPY_AB){
+	if (inst == CPY_IM || inst == CPY_ZP || inst == CPY_AB){
+		byte result = cpu->Y - value;
 		CPU_set_flag_c_borrow(cpu, value);
-		CPU_set_flag_z(cpu, value);
-		CPU_set_flag_n(cpu, value);
+		CPU_set_flag_z(cpu, result);
+		CPU_set_flag_n(cpu, result);
 	}
-	else if (inst == DEC_ZP && inst == DEC_AB &&
-			 inst == DEX	&& inst == DEY    &&
-			 inst == EOR_IM && inst == EOR_ZP &&
-			 inst == EOR_AB && inst == INC_ZP && 
-			 inst == INC_AB && inst == INX 	  && 
-			 inst == INY    && inst == LDA_IM &&
-			 inst == LDA_ZP && inst == LDX_IM && 
-			 inst == LDX_ZP && inst == LDY_IM && 
+	else if (inst == DEC_ZP || inst == DEC_AB ||
+			 inst == DEX	|| inst == DEY    ||
+			 inst == EOR_IM || inst == EOR_ZP ||
+			 inst == EOR_AB || inst == INC_ZP || 
+			 inst == INC_AB || inst == INX 	  || 
+			 inst == INY    || inst == LDA_IM ||
+			 inst == LDA_ZP || inst == LDX_IM || 
+			 inst == LDX_ZP || inst == LDY_IM || 
 			 inst == LDY_ZP)
 	{
 		CPU_set_flag_z(cpu, value);
 		CPU_set_flag_n(cpu, value);
 	}
-	else if (inst == LSR_A  && inst == LSR_ZP && inst == LSR_AB ){
+	else if (inst == LSR_A  || inst == LSR_ZP || inst == LSR_AB ){
 		CPU_set_flag_c_carry(cpu, value);
 		cpu->N = 0;
 		value >>= 8;
