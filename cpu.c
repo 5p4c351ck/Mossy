@@ -51,19 +51,19 @@ void CPU_reset(struct CPU *cpu){
 
 void CPU_state(struct CPU* cpu){
 
-	printf("\n---CPU STATUS---\n");
-	printf("Program counter: %d\n", cpu->PC);
-	printf("Stack pointer: %d\n", cpu->SP);
-	printf("Register A: %d\n", cpu->A);
-	printf("Reguister X: %d\n", cpu->X);
-	printf("Reguister Y: %d\n", cpu->Y);
-	printf("Flag C: %d\n", cpu->C);
-	printf("Flag Z: %d\n", cpu->Z);
-	printf("Flag I: %d\n", cpu->I);
-	printf("Flag D: %d\n", cpu->D);
-	printf("Flag B: %d\n", cpu->B);
-	printf("Flag V: %d\n", cpu->V);
-	printf("Flag N: %d\n", cpu->N);
+	printf("\t\t---CPU STATUS---\n");
+	printf("\t\tProgram counter: %d\n", cpu->PC);
+	printf("\t\tStack pointer: %d\n", cpu->SP);
+	printf("\t\tRegister A: %d\n", cpu->A);
+	printf("\t\tReguister X: %d\n", cpu->X);
+	printf("\t\tReguister Y: %d\n", cpu->Y);
+	printf("\t\tFlag C: %d\n", cpu->C);
+	printf("\t\tFlag Z: %d\n", cpu->Z);
+	printf("\t\tFlag I: %d\n", cpu->I);
+	printf("\t\tFlag D: %d\n", cpu->D);
+	printf("\t\tFlag B: %d\n", cpu->B);
+	printf("\t\tFlag V: %d\n", cpu->V);
+	printf("\t\tFlag N: %d\n", cpu->N);
 }
 
 void CPU_exec(struct CPU * cpu, struct memory* mem, unsigned long long cycles){
@@ -92,26 +92,26 @@ void CPU_exec(struct CPU * cpu, struct memory* mem, unsigned long long cycles){
 
 		case DEC_ZP:
 			zp_addr = CPU_fetch_byte(cpu, mem, &cycles);
-			CPU_dec_cycle(&cycles, 2);
+			CPU_dec_cycles(&cycles, 2);
 			mem->cell[zp_addr]--;
 			CPU_set_flags(cpu, inst, CPU_read_byte(cpu, mem, zp_addr, &cycles));
 		break;
 
 		case DEC_AB:
 			ab_addr = CPU_fetch_word(cpu, mem, &cycles);
-			CPU_dec_cycle(&cycles, 2);
+			CPU_dec_cycles(&cycles, 2);
 			mem->cell[ab_addr]--;
 			CPU_set_flags(cpu, inst, CPU_read_byte(cpu, mem, ab_addr, &cycles));
 		break;
 
 		case DEX:
-			CPU_dec_cycle(&cycles, 1);
+			CPU_dec_cycles(&cycles, 1);
 			cpu->X--;
 			CPU_set_flags(cpu, inst, cpu->X);
 		break;
 
 		case DEY:
-			CPU_dec_cycle(&cycles, 1);
+			CPU_dec_cycles(&cycles, 1);
 			cpu->Y--;
 			CPU_set_flags(cpu, inst, cpu->Y);
 		break;
@@ -133,26 +133,26 @@ void CPU_exec(struct CPU * cpu, struct memory* mem, unsigned long long cycles){
 
 		case INC_ZP:
 			zp_addr = CPU_fetch_byte(cpu, mem, &cycles);
-			CPU_dec_cycle(&cycles, 1);
+			CPU_dec_cycles(&cycles, 1);
 			mem->cell[zp_addr]++;   
 			CPU_set_flags(cpu, inst, CPU_read_byte(cpu, mem, zp_addr, &cycles));
 		break;
 
 		case INC_AB:
 			ab_addr = CPU_fetch_word(cpu, mem, &cycles);
-			CPU_dec_cycle(&cycles, 1);
+			CPU_dec_cycles(&cycles, 1);
 			mem->cell[ab_addr]++;
 			CPU_set_flags(cpu, inst, CPU_read_byte(cpu, mem, ab_addr, &cycles));
 		break;
 
 		case INX:
-			CPU_dec_cycle(&cycles, 1);
+			CPU_dec_cycles(&cycles, 1);
 			cpu->X++;
 			CPU_set_flags(cpu, inst, cpu->X);
 		break;
 
 		case INY:
-			CPU_dec_cycle(&cycles, 1);
+			CPU_dec_cycles(&cycles, 1);
 			cpu->Y++;
 			CPU_set_flags(cpu, inst, cpu->Y);
 		break;
@@ -201,34 +201,34 @@ void CPU_exec(struct CPU * cpu, struct memory* mem, unsigned long long cycles){
 			break;
 		/*LSR always sets the N flag to 0 so we dont need to use a machine cycle to check*/
 		case LSR_A:
-			CPU_dec_cycle(&cycles, 1);
+			CPU_dec_cycles(&cycles, 1);
 			CPU_set_flags(cpu, inst, cpu->A);
 			cpu->A >>= 1;
 			break;
 
 		case LSR_ZP:
 			zp_addr = CPU_fetch_byte(cpu, mem, &cycles);
-			CPU_dec_cycle(&cycles, 2);
+			CPU_dec_cycles(&cycles, 2);
 			CPU_set_flags(cpu, inst, CPU_read_byte(cpu, mem, zp_addr, &cycles));
 			mem->cell[zp_addr] >>= 1;
 			break;
 
 		case LSR_AB:
 			ab_addr = CPU_fetch_word(cpu, mem, &cycles);
-			CPU_dec_cycle(&cycles, 2);
+			CPU_dec_cycles(&cycles, 2);
 			CPU_set_flags(cpu, inst, CPU_read_byte(cpu, mem, ab_addr, &cycles));
 			mem->cell[ab_addr] >>= 1;
 			break;
 
 		case NOP:
-			CPU_dec_cycle(&cycles, 1);
+			CPU_dec_cycles(&cycles, 1);
 			break;
 
 		case RTS:
 			high = stack_pop(cpu, mem, &cycles);
 			low = stack_pop(cpu, mem, &cycles);
 			CPU_combine_bytes(&cpu->PC, low, high, &cycles);
-			CPU_dec_cycle(&cycles, 1);
+			CPU_dec_cycles(&cycles, 1);
 			cpu->PC++;
 			break;
 		default:
@@ -243,7 +243,7 @@ void CPU_exec(struct CPU * cpu, struct memory* mem, unsigned long long cycles){
 
 byte CPU_fetch_byte(struct CPU * cpu, struct memory* mem, unsigned long long *cycles){
 	if (cpu->PC >= 0 && cpu->PC < sizeof(mem->cell)){
-	CPU_dec_cycle(cycles, 1);
+	CPU_dec_cycles(cycles, 1);
 	byte inst = mem->cell[cpu->PC];
 	cpu->PC += 1;
 	return inst;
@@ -256,7 +256,7 @@ byte CPU_fetch_byte(struct CPU * cpu, struct memory* mem, unsigned long long *cy
 /*Two machine cycles are used to fetch a word(16bits) from memory*/
 word CPU_fetch_word(struct CPU * cpu, struct memory* mem, unsigned long long *cycles){
 	if (cpu->PC >= 0 && cpu->PC < sizeof(mem->cell)){
-	CPU_dec_cycle(cycles, 2);		
+	CPU_dec_cycles(cycles, 2);		
 	word data = mem->cell[cpu->PC];		/*6502 is little endian so this is the least significant byte*/
 	cpu->PC += 1;
 
@@ -271,7 +271,7 @@ word CPU_fetch_word(struct CPU * cpu, struct memory* mem, unsigned long long *cy
 
 byte CPU_read_byte(struct CPU * cpu, struct memory* mem, word addr, unsigned long long *cycles){
 	if (cpu->PC >= 0 && cpu->PC < sizeof(mem->cell)){
-	CPU_dec_cycle(cycles, 1);
+	CPU_dec_cycles(cycles, 1);
 	byte data = mem->cell[addr];
 	return data;
 	}
@@ -281,13 +281,13 @@ byte CPU_read_byte(struct CPU * cpu, struct memory* mem, word addr, unsigned lon
 }
 
 void CPU_split_word(word value, byte *low, byte *high, unsigned long long *cycles){
-	CPU_dec_cycle(cycles, 1);
+	CPU_dec_cycles(cycles, 1);
 	(*low) = ((value) & 0xFF);
 	(*high) = ((value) >> 8);
 }
 
 void CPU_combine_bytes(word *value, byte low, byte high, unsigned long long *cycles){
-	CPU_dec_cycle(cycles, 2);
+	CPU_dec_cycles(cycles, 2);
 	(*value) = (high << 8);
 	(*value) |= low;
 
@@ -350,7 +350,7 @@ static void CPU_set_flags(struct CPU *cpu, byte inst, byte value){
 		finish an instruction before starting its execution
 	*/
 
-void CPU_dec_cycle(unsigned long long *cycles, unsigned short dec){
+void CPU_dec_cycles(unsigned long long *cycles, unsigned short dec){
 	if ((*cycles) > 0 && (*cycles) >= dec){
 		(*cycles)-= dec;
 	}

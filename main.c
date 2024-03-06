@@ -3,12 +3,11 @@
 #include "cpu.h"
 #include "memory.h"
 
-
 int main(void){
-
+	
 	struct memory* mem = init_memory();
 	struct CPU* cpu = CPU_power_on();	
-
+	
 	CPU_reset(cpu);
 
 						/*Hardcoded program for debugging purposes*/

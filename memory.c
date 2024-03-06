@@ -39,7 +39,7 @@ void free_memory(struct memory** mem){
 
 extern void stack_push(struct CPU* cpu, struct memory* mem, byte data, unsigned long long *cycles){
     if ((fixed_high + cpu->SP) >= intenal_stack_bottom && (fixed_high + cpu->SP) <= intenal_stack_top){
-    CPU_dec_cycle(cycles, 1);                                                                                   
+    CPU_dec_cycles(cycles, 1);                                                                                   
     if (cpu->SP == stack_bottom) stack_rollback++;
     mem->cell[fixed_high + cpu->SP] = data;                                           
     cpu->SP--;
@@ -51,7 +51,7 @@ extern void stack_push(struct CPU* cpu, struct memory* mem, byte data, unsigned 
 
 extern byte stack_pop(struct CPU* cpu, struct memory* mem, unsigned long long *cycles){   
     if ((fixed_high + cpu->SP) >= intenal_stack_bottom && (fixed_high + cpu->SP) <= intenal_stack_top){                     
-    CPU_dec_cycle(cycles, 1);    
+    CPU_dec_cycles(cycles, 1);    
     if(cpu->SP == stack_top && stack_rollback == 0){
             printf("Stack is empty\n"); /*Left here for debugging purposes to be removed later*/
     }

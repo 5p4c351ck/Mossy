@@ -79,5 +79,5 @@ static void CPU_set_flag_n(struct CPU *cpu, byte value);
 static void CPU_set_flag_c_carry(struct CPU *cpu, byte value);
 static void CPU_set_flag_c_borrow(struct CPU *cpu, byte value);
 static void CPU_set_flags(struct CPU *cpu, byte inst, byte value);
-extern void CPU_dec_cycle(unsigned long long *cycles, unsigned short dec);
+extern void CPU_dec_cycles(unsigned long long *cycles, unsigned short dec);
 #endif
