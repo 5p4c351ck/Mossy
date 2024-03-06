@@ -237,8 +237,12 @@ void CPU_exec(struct CPU * cpu, struct memory* mem, unsigned long long cycles){
 	}
 }
 
+/*The following bound checking is redundant since the program counter
+  cannot be negative or higher than 65535 since its a word(unsigned short)
+  but will be kept as is since it doesn't cause any problems to check*/
+
 byte CPU_fetch_byte(struct CPU * cpu, struct memory* mem, unsigned long long *cycles){
-	if (cpu->PC >= 0 && cpu->PC <= sizeof(mem->cell)){
+	if (cpu->PC >= 0 && cpu->PC < sizeof(mem->cell)){
 	CPU_dec_cycle(cycles, 1);
 	byte inst = mem->cell[cpu->PC];
 	cpu->PC += 1;
@@ -251,7 +255,7 @@ byte CPU_fetch_byte(struct CPU * cpu, struct memory* mem, unsigned long long *cy
 
 /*Two machine cycles are used to fetch a word(16bits) from memory*/
 word CPU_fetch_word(struct CPU * cpu, struct memory* mem, unsigned long long *cycles){
-	if (cpu->PC >= 0 && cpu->PC <= sizeof(mem->cell)){
+	if (cpu->PC >= 0 && cpu->PC < sizeof(mem->cell)){
 	CPU_dec_cycle(cycles, 2);		
 	word data = mem->cell[cpu->PC];		/*6502 is little endian so this is the least significant byte*/
 	cpu->PC += 1;
@@ -266,7 +270,7 @@ word CPU_fetch_word(struct CPU * cpu, struct memory* mem, unsigned long long *cy
 }
 
 byte CPU_read_byte(struct CPU * cpu, struct memory* mem, word addr, unsigned long long *cycles){
-	if (cpu->PC >= 0 && cpu->PC <= sizeof(mem->cell)){
+	if (cpu->PC >= 0 && cpu->PC < sizeof(mem->cell)){
 	CPU_dec_cycle(cycles, 1);
 	byte data = mem->cell[addr];
 	return data;
