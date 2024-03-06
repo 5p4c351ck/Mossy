@@ -64,5 +64,31 @@ extern byte stack_pop(struct CPU* cpu, struct memory* mem, unsigned long long *c
 }
 else{
     exit_and_save_status(cpu, OUFOFBOUNDSSTACK);
+
 }
 }
+
+extern void operate_addr(struct CPU *cpu, struct memory* mem, word addr, enum operations oper, unsigned long long *cycles){
+    if (addr >= 0 && addr < sizeof(mem->cell)){
+        CPU_dec_cycles(cycles, 1);
+    switch(oper){
+        case DEC:
+            mem->cell[addr]--;
+        break;  
+        case INC:
+            mem->cell[addr]++;
+	    break;
+        case LSH:
+            mem->cell[addr] <<= 1;
+	    break;
+        case RSH:
+            mem->cell[addr] >>= 1;
+        break;
+    }
+    }
+    else{
+        exit_and_save_status(cpu, OUTOFBOUNDSMEM);
+    }
+}
+
+

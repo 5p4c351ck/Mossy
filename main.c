@@ -2,6 +2,7 @@
 
 #include "cpu.h"
 #include "memory.h"
+#include "logging.h"
 
 int main(void){
 	

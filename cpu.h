@@ -36,6 +36,8 @@
 #define 	NOP			0xEA		/*No operation	   		   		Implied   		1 byte 		2 cycles*/
 #define 	RTS			0x60		/*Return from subroutine   		Implied   		1 byte 		6 cycles*/
 
+enum operations;
+
 struct memory;
 
 struct CPU{
@@ -79,5 +81,7 @@ static void CPU_set_flag_n(struct CPU *cpu, byte value);
 static void CPU_set_flag_c_carry(struct CPU *cpu, byte value);
 static void CPU_set_flag_c_borrow(struct CPU *cpu, byte value);
 static void CPU_set_flags(struct CPU *cpu, byte inst, byte value);
+static void CPU_operate_reg(struct CPU *cpu, byte *reg, enum operations oper, unsigned long long *cycles);
+static void CPU_inc_program_counter(struct CPU* cpu, struct memory *mem, unsigned long long *cycles);
 extern void CPU_dec_cycles(unsigned long long *cycles, unsigned short dec);
 #endif

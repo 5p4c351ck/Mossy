@@ -92,27 +92,25 @@ void CPU_exec(struct CPU * cpu, struct memory* mem, unsigned long long cycles){
 
 		case DEC_ZP:
 			zp_addr = CPU_fetch_byte(cpu, mem, &cycles);
-			CPU_dec_cycles(&cycles, 2);
-			mem->cell[zp_addr]--;
+			CPU_dec_cycles(&cycles, 1);
+			operate_addr(cpu, mem, zp_addr, DEC, &cycles);
 			CPU_set_flags(cpu, inst, CPU_read_byte(cpu, mem, zp_addr, &cycles));
 		break;
 
 		case DEC_AB:
 			ab_addr = CPU_fetch_word(cpu, mem, &cycles);
-			CPU_dec_cycles(&cycles, 2);
-			mem->cell[ab_addr]--;
+			CPU_dec_cycles(&cycles, 1);
+			operate_addr(cpu, mem, ab_addr, DEC, &cycles);
 			CPU_set_flags(cpu, inst, CPU_read_byte(cpu, mem, ab_addr, &cycles));
 		break;
 
 		case DEX:
-			CPU_dec_cycles(&cycles, 1);
-			cpu->X--;
+			CPU_operate_reg(cpu, &cpu->X, DEC, &cycles);
 			CPU_set_flags(cpu, inst, cpu->X);
 		break;
 
 		case DEY:
-			CPU_dec_cycles(&cycles, 1);
-			cpu->Y--;
+			CPU_operate_reg(cpu, &cpu->Y, DEC, &cycles);
 			CPU_set_flags(cpu, inst, cpu->Y);
 		break;
 
@@ -133,27 +131,23 @@ void CPU_exec(struct CPU * cpu, struct memory* mem, unsigned long long cycles){
 
 		case INC_ZP:
 			zp_addr = CPU_fetch_byte(cpu, mem, &cycles);
-			CPU_dec_cycles(&cycles, 1);
-			mem->cell[zp_addr]++;   
+			operate_addr(cpu, mem, zp_addr, INC, &cycles);  
 			CPU_set_flags(cpu, inst, CPU_read_byte(cpu, mem, zp_addr, &cycles));
 		break;
 
 		case INC_AB:
 			ab_addr = CPU_fetch_word(cpu, mem, &cycles);
-			CPU_dec_cycles(&cycles, 1);
-			mem->cell[ab_addr]++;
+			operate_addr(cpu, mem, ab_addr, INC, &cycles);
 			CPU_set_flags(cpu, inst, CPU_read_byte(cpu, mem, ab_addr, &cycles));
 		break;
 
 		case INX:
-			CPU_dec_cycles(&cycles, 1);
-			cpu->X++;
+			CPU_operate_reg(cpu, &cpu->X, INC, &cycles);
 			CPU_set_flags(cpu, inst, cpu->X);
 		break;
 
 		case INY:
-			CPU_dec_cycles(&cycles, 1);
-			cpu->Y++;
+			CPU_operate_reg(cpu, &cpu->Y, INC, &cycles);
 			CPU_set_flags(cpu, inst, cpu->Y);
 		break;
 
@@ -201,23 +195,22 @@ void CPU_exec(struct CPU * cpu, struct memory* mem, unsigned long long cycles){
 			break;
 		/*LSR always sets the N flag to 0 so we dont need to use a machine cycle to check*/
 		case LSR_A:
-			CPU_dec_cycles(&cycles, 1);
 			CPU_set_flags(cpu, inst, cpu->A);
-			cpu->A >>= 1;
+			CPU_operate_reg(cpu, &cpu->A, RSH, &cycles);
 			break;
 
 		case LSR_ZP:
 			zp_addr = CPU_fetch_byte(cpu, mem, &cycles);
-			CPU_dec_cycles(&cycles, 2);
+			CPU_dec_cycles(&cycles, 1);
 			CPU_set_flags(cpu, inst, CPU_read_byte(cpu, mem, zp_addr, &cycles));
-			mem->cell[zp_addr] >>= 1;
+			operate_addr(cpu, mem, zp_addr, RSH, &cycles); 
 			break;
 
 		case LSR_AB:
 			ab_addr = CPU_fetch_word(cpu, mem, &cycles);
-			CPU_dec_cycles(&cycles, 2);
+			CPU_dec_cycles(&cycles, 1);
 			CPU_set_flags(cpu, inst, CPU_read_byte(cpu, mem, ab_addr, &cycles));
-			mem->cell[ab_addr] >>= 1;
+			operate_addr(cpu, mem, ab_addr, RSH, &cycles);
 			break;
 
 		case NOP:
@@ -228,8 +221,7 @@ void CPU_exec(struct CPU * cpu, struct memory* mem, unsigned long long cycles){
 			high = stack_pop(cpu, mem, &cycles);
 			low = stack_pop(cpu, mem, &cycles);
 			CPU_combine_bytes(&cpu->PC, low, high, &cycles);
-			CPU_dec_cycles(&cycles, 1);
-			cpu->PC++;
+			CPU_inc_program_counter(cpu, mem, &cycles);
 			break;
 		default:
 			break;
@@ -243,9 +235,8 @@ void CPU_exec(struct CPU * cpu, struct memory* mem, unsigned long long cycles){
 
 byte CPU_fetch_byte(struct CPU * cpu, struct memory* mem, unsigned long long *cycles){
 	if (cpu->PC >= 0 && cpu->PC < sizeof(mem->cell)){
-	CPU_dec_cycles(cycles, 1);
 	byte inst = mem->cell[cpu->PC];
-	cpu->PC += 1;
+	CPU_inc_program_counter(cpu, mem, cycles);
 	return inst;
 	}
 	else{
@@ -255,13 +246,12 @@ byte CPU_fetch_byte(struct CPU * cpu, struct memory* mem, unsigned long long *cy
 
 /*Two machine cycles are used to fetch a word(16bits) from memory*/
 word CPU_fetch_word(struct CPU * cpu, struct memory* mem, unsigned long long *cycles){
-	if (cpu->PC >= 0 && cpu->PC < sizeof(mem->cell)){
-	CPU_dec_cycles(cycles, 2);		
+	if (cpu->PC >= 0 && cpu->PC < sizeof(mem->cell)){	
 	word data = mem->cell[cpu->PC];		/*6502 is little endian so this is the least significant byte*/
-	cpu->PC += 1;
+	CPU_inc_program_counter(cpu, mem, cycles);
 
 	data |= (mem->cell[cpu->PC] << 8);	/*6502 is little endian so this is the most significant byte*/
-	cpu->PC += 1;    
+	CPU_inc_program_counter(cpu, mem, cycles);   
 	return data;
 	}
 	else{
@@ -270,7 +260,7 @@ word CPU_fetch_word(struct CPU * cpu, struct memory* mem, unsigned long long *cy
 }
 
 byte CPU_read_byte(struct CPU * cpu, struct memory* mem, word addr, unsigned long long *cycles){
-	if (cpu->PC >= 0 && cpu->PC < sizeof(mem->cell)){
+	if (addr >= 0 && addr < sizeof(mem->cell)){
 	CPU_dec_cycles(cycles, 1);
 	byte data = mem->cell[addr];
 	return data;
@@ -342,6 +332,36 @@ static void CPU_set_flags(struct CPU *cpu, byte inst, byte value){
 		cpu->N = 0;
 		value >>= 8;
 		CPU_set_flag_z(cpu, value);
+	}
+}
+
+static void CPU_operate_reg(struct CPU* cpu, byte *reg, enum operations oper, unsigned long long *cycles){
+	if (reg != NULL){
+    CPU_dec_cycles(cycles, 1);
+    switch(oper){
+        case DEC:
+            (*reg)--;
+        break;  
+        case INC:
+            (*reg)++;
+	    break;
+        case LSH:
+            (*reg) <<= 1;
+	    break;
+        case RSH:
+            (*reg) >>= 1;
+        break;
+	}
+	}
+    else{
+        exit_and_save_status(cpu, OUTOFBOUNDSMEM);
+    }
+}
+
+static void CPU_inc_program_counter(struct CPU* cpu, struct memory *mem, unsigned long long *cycles){
+	if (cpu->PC < sizeof(mem->cell)){
+		    CPU_dec_cycles(cycles, 1);
+			cpu->PC++;
 	}
 }
 
