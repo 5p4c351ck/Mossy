@@ -359,11 +359,16 @@ static void CPU_operate_reg(struct CPU* cpu, byte *reg, enum operations oper, un
 }
 
 static void CPU_inc_program_counter(struct CPU* cpu, struct memory *mem, unsigned long long *cycles){
+	if (cpu != NULL){
 	if (cpu->PC < sizeof(mem->cell)){
 		    CPU_dec_cycles(cycles, 1);
 			cpu->PC++;
+		}
+	else{
+       	exit_and_save_status(cpu, OUTOFBOUNDSMEM);
+		}
+	} 
 	}
-}
 
 	/*
 		Checking whether or not there are enough cycles left to
