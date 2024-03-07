@@ -12,9 +12,9 @@ int main(void){
 	CPU_reset(cpu);
 
 						/*Hardcoded program for debugging purposes*/
-	cpu->Y = 0xFF;
+	cpu->Y = 0xFE;
 
-	mem->cell[0] = 0xC0;
+	mem->cell[0] = 0xE0;
 	mem->cell[1] = 0xFF;
 
 	CPU_exec(cpu, mem, 2);

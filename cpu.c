@@ -73,6 +73,24 @@ void CPU_exec(struct CPU * cpu, struct memory* mem, unsigned long long cycles){
 		byte inst = CPU_fetch_byte(cpu, mem, &cycles);
 		switch (inst)
 		{
+
+		case CPX_IM:
+			low = CPU_fetch_byte(cpu, mem, &cycles);
+			CPU_set_flags(cpu, inst, low);
+		break;
+
+		case CPX_ZP:
+			zp_addr = CPU_fetch_byte(cpu, mem, &cycles);
+			low = CPU_read_byte(cpu, mem, zp_addr, &cycles);
+			CPU_set_flags(cpu, inst, low);
+		break;
+
+		case CPX_AB:
+			ab_addr = CPU_fetch_word(cpu, mem, &cycles);
+			low = CPU_read_byte(cpu, mem, ab_addr, &cycles);
+			CPU_set_flags(cpu, inst, low);
+		break;
+
 		case CPY_IM:
 			low = CPU_fetch_byte(cpu, mem, &cycles);
 			CPU_set_flags(cpu, inst, low);
@@ -310,6 +328,12 @@ static void CPU_set_flag_c_borrow(struct CPU *cpu, byte value){
 static void CPU_set_flags(struct CPU *cpu, byte inst, byte value){
 	if (inst == CPY_IM || inst == CPY_ZP || inst == CPY_AB){
 		byte result = cpu->Y - value;
+		CPU_set_flag_c_borrow(cpu, value);
+		CPU_set_flag_z(cpu, result);
+		CPU_set_flag_n(cpu, result);
+	}
+	else if (inst == CPX_IM || inst == CPX_ZP || inst == CPX_AB){
+		byte result = cpu->X - value;
 		CPU_set_flag_c_borrow(cpu, value);
 		CPU_set_flag_z(cpu, result);
 		CPU_set_flag_n(cpu, result);

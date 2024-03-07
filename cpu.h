@@ -8,6 +8,9 @@
 
 /*						OPCODE			DESCTRIPTION				ADDRESSING	 	 BYTES		  CYCLES			*/
 
+#define		CPX_IM		0xE0		/*Compare Memory and Index X	Immediate		2 bytes		2 cycles*/
+#define		CPX_ZP		0xE4		/*Compare Memory and Index X	Zero page		2 bytes		3 cycles*/
+#define		CPX_AB		0xEC		/*Compare Memory and Index X	Absolute		3 bytes		4 cycles*/
 #define		CPY_IM		0xC0		/*Compare Memory and Index Y	Immediate		2 bytes		2 cycles*/
 #define		CPY_ZP		0xC4		/*Compare Memory and Index Y	Zero page		2 bytes		3 cycles*/
 #define		CPY_AB		0xCC		/*Compare Memory and Index Y	Absolute		3 bytes		4 cycles*/
