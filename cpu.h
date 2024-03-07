@@ -6,38 +6,42 @@
 
 /*Instructions and opcodes*/
 
-/*						OPCODE			DESCTRIPTION				ADDRESSING	 	 BYTES		  CYCLES			*/
+/*						OPCODE			DESCTRIPTION					ADDRESSING	 	 BYTES		  CYCLES			*/
 
-#define		CPX_IM		0xE0		/*Compare Memory and Index X	Immediate		2 bytes		2 cycles*/
-#define		CPX_ZP		0xE4		/*Compare Memory and Index X	Zero page		2 bytes		3 cycles*/
-#define		CPX_AB		0xEC		/*Compare Memory and Index X	Absolute		3 bytes		4 cycles*/
-#define		CPY_IM		0xC0		/*Compare Memory and Index Y	Immediate		2 bytes		2 cycles*/
-#define		CPY_ZP		0xC4		/*Compare Memory and Index Y	Zero page		2 bytes		3 cycles*/
-#define		CPY_AB		0xCC		/*Compare Memory and Index Y	Absolute		3 bytes		4 cycles*/
-#define		DEC_ZP		0xC6		/*Decrement Memory by One		Zero page		2 bytes		5 cycles*/
-#define		DEC_AB		0xCE		/*Decrement Memory by One		Absolute		3 bytes		6 cycles*/
-#define		DEX			0xCA		/*Decrement Index X by One		Implied			1 bytes		2 cycles*/
-#define		DEY			0x88		/*Decrement Index Y by One		Implied			1 bytes		2 cycles*/	
-#define		EOR_IM		0x49		/*XOR Accumulator			 	Immediate		2 bytes		2 cycles*/
-#define		EOR_ZP		0x45		/*XOR Accumulator  				Zero page		2 bytes		3 cycles*/
-#define		EOR_AB		0x4D		/*XOR Accumulator 				Absolute		3 bytes		4 cycles*/
-#define		INC_ZP		0xE6		/*Increment Memory by One  		Zero page		2 bytes		5 cycles*/
-#define		INC_AB		0xEE		/*Increment Memory by One		Absolute 		3 bytes		6 cycles*/
-#define		INX			0xE8		/*Increment Index X by One 		Implied  		1 bytes		2 cycles*/
-#define		INY			0xC8		/*Increment Index Y by One 		Implied  		1 bytes		2 cycles*/
-#define		JMP			0x4C		/*Jump 			 		   		Absolute 		3 bytes		3 cycles*/
-#define		JSR			0x20		/*Jump to subroutine  		   	Absolute 		3 bytes		6 cycles*/
-#define 	LDA_IM		0xA9		/*Load accumulator 		   		Immediate		2 bytes		2 cycles*/
-#define 	LDA_ZP		0xA5		/*Load accumulator 		   		Zero page		2 bytes		3 cycles*/
-#define 	LDX_IM		0xA2		/*Register X	 	       		Immediate		2 bytes		3 cycles*/
-#define 	LDX_ZP		0xA6		/*Register X 	  		   		Zero page		2 bytes		3 cycles*/
-#define 	LDY_IM		0xA0		/*Register Y	 	  	   		Immediate		2 bytes		3 cycles*/
-#define 	LDY_ZP		0xA4		/*Register Y	 	  	   		Zero page		2 bytes		3 cycles*/
-#define 	LSR_A		0x4A		/*No operation	   		   		Accumulator 	1 byte 		2 cycles*/
-#define 	LSR_ZP		0x46		/*No operation	   		   		Zero page   	2 byte 		5 cycles*/
-#define 	LSR_AB		0x4E		/*No operation	   		   		Absolute    	3 byte 		6 cycles*/
-#define 	NOP			0xEA		/*No operation	   		   		Implied   		1 byte 		2 cycles*/
-#define 	RTS			0x60		/*Return from subroutine   		Implied   		1 byte 		6 cycles*/
+#define		CLV			0xB8		/*Clear Overflow Flag				Implied			1 bytes		2 cycles*/
+#define		CMP_IM		0xC9		/*Compare Memory with Accumulator	Immediate		2 bytes		2 cycles*/
+#define		CMP_ZP		0xC5 		/*Compare Memory with Accumulator	Zero page		2 bytes		3 cycles*/
+#define		CMP_AB		0xCD		/*Compare Memory with Accumulator	Absolute		3 bytes		4 cycles*/
+#define		CPX_IM		0xE0		/*Compare Memory and Index X		Immediate		2 bytes		2 cycles*/
+#define		CPX_ZP		0xE4		/*Compare Memory and Index X		Zero page		2 bytes		3 cycles*/
+#define		CPX_AB		0xEC		/*Compare Memory and Index X		Absolute		3 bytes		4 cycles*/
+#define		CPY_IM		0xC0		/*Compare Memory and Index Y		Immediate		2 bytes		2 cycles*/
+#define		CPY_ZP		0xC4		/*Compare Memory and Index Y		Zero page		2 bytes		3 cycles*/
+#define		CPY_AB		0xCC		/*Compare Memory and Index Y		Absolute		3 bytes		4 cycles*/
+#define		DEC_ZP		0xC6		/*Decrement Memory by One			Zero page		2 bytes		5 cycles*/
+#define		DEC_AB		0xCE		/*Decrement Memory by One			Absolute		3 bytes		6 cycles*/
+#define		DEX			0xCA		/*Decrement Index X by One			Implied			1 bytes		2 cycles*/
+#define		DEY			0x88		/*Decrement Index Y by One			Implied			1 bytes		2 cycles*/	
+#define		EOR_IM		0x49		/*XOR Accumulator			 		Immediate		2 bytes		2 cycles*/
+#define		EOR_ZP		0x45		/*XOR Accumulator  					Zero page		2 bytes		3 cycles*/
+#define		EOR_AB		0x4D		/*XOR Accumulator 					Absolute		3 bytes		4 cycles*/
+#define		INC_ZP		0xE6		/*Increment Memory by One  			Zero page		2 bytes		5 cycles*/
+#define		INC_AB		0xEE		/*Increment Memory by One			Absolute 		3 bytes		6 cycles*/
+#define		INX			0xE8		/*Increment Index X by One 			Implied  		1 bytes		2 cycles*/
+#define		INY			0xC8		/*Increment Index Y by One 			Implied  		1 bytes		2 cycles*/
+#define		JMP			0x4C		/*Jump 			 		   			Absolute 		3 bytes		3 cycles*/
+#define		JSR			0x20		/*Jump to subroutine  		   		Absolute 		3 bytes		6 cycles*/
+#define 	LDA_IM		0xA9		/*Load accumulator 		   			Immediate		2 bytes		2 cycles*/
+#define 	LDA_ZP		0xA5		/*Load accumulator 		   			Zero page		2 bytes		3 cycles*/
+#define 	LDX_IM		0xA2		/*Register X	 	       			Immediate		2 bytes		3 cycles*/
+#define 	LDX_ZP		0xA6		/*Register X 	  		   			Zero page		2 bytes		3 cycles*/
+#define 	LDY_IM		0xA0		/*Register Y	 	  	   			Immediate		2 bytes		3 cycles*/
+#define 	LDY_ZP		0xA4		/*Register Y	 	  	   			Zero page		2 bytes		3 cycles*/
+#define 	LSR_A		0x4A		/*No operation	   		   			Accumulator 	1 byte 		2 cycles*/
+#define 	LSR_ZP		0x46		/*No operation	   		   			Zero page   	2 byte 		5 cycles*/
+#define 	LSR_AB		0x4E		/*No operation	   		   			Absolute    	3 byte 		6 cycles*/
+#define 	NOP			0xEA		/*No operation	   		   			Implied   		1 byte 		2 cycles*/
+#define 	RTS			0x60		/*Return from subroutine   			Implied   		1 byte 		6 cycles*/
 
 enum operations;
 

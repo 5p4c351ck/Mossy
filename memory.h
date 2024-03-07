@@ -12,7 +12,10 @@ enum operations
 	DEC,
 	INC,
 	LSH,
-	RSH
+	RSH,
+	AND,
+	OR,
+	XOR
 	};
 
 struct memory{
@@ -27,6 +30,5 @@ extern void free_memory(struct memory** mem);
 extern void stack_push(struct CPU* cpu, struct memory* mem, byte data, unsigned long long *cycles);
 extern byte stack_pop(struct CPU*, struct memory* mem, unsigned long long *cycles);
 extern void operate_addr(struct CPU *cpu, struct memory* mem, word addr, enum operations oper, unsigned long long *cycles);
-
 
 #endif

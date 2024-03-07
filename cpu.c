@@ -73,8 +73,29 @@ void CPU_exec(struct CPU * cpu, struct memory* mem, unsigned long long cycles){
 		byte inst = CPU_fetch_byte(cpu, mem, &cycles);
 		switch (inst)
 		{
+		case CLV:
+			CPU_dec_cycles(&cycles, 1);
+			CPU_set_flags(cpu, inst, low);
+		break;
 
-		case CPX_IM:
+		case CMP_IM: 
+			low = CPU_fetch_byte(cpu, mem, &cycles);
+			CPU_set_flags(cpu, inst, low);
+		break;
+
+		case CMP_ZP:
+			zp_addr = CPU_fetch_byte(cpu, mem, &cycles);
+			low = CPU_read_byte(cpu, mem, zp_addr, &cycles);
+			CPU_set_flags(cpu, inst, low);
+		break;
+
+		case CMP_AB:
+			ab_addr = CPU_fetch_word(cpu, mem, &cycles);
+			low = CPU_read_byte(cpu, mem, ab_addr, &cycles);
+			CPU_set_flags(cpu, inst, low);
+		break;
+
+		case CPX_IM: 
 			low = CPU_fetch_byte(cpu, mem, &cycles);
 			CPU_set_flags(cpu, inst, low);
 		break;
@@ -337,6 +358,15 @@ static void CPU_set_flags(struct CPU *cpu, byte inst, byte value){
 		CPU_set_flag_c_borrow(cpu, value);
 		CPU_set_flag_z(cpu, result);
 		CPU_set_flag_n(cpu, result);
+	}
+	else if (inst == CMP_IM || inst == CMP_ZP || inst == CMP_AB){
+		byte result = cpu->A - value;
+		CPU_set_flag_c_borrow(cpu, value);
+		CPU_set_flag_z(cpu, result);
+		CPU_set_flag_n(cpu, result);
+	}
+	else if (inst == CLV){
+		cpu->V ^= cpu->V;
 	}
 	else if (inst == DEC_ZP || inst == DEC_AB ||
 			 inst == DEX	|| inst == DEY    ||
