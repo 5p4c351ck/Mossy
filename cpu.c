@@ -272,7 +272,7 @@ void CPU_exec(struct CPU * cpu, struct memory* mem, unsigned long long cycles){
   cannot be negative or higher than 65535 since its a word(unsigned short)
   but will be kept as is since it doesn't cause any problems to check*/
 
-byte CPU_fetch_byte(struct CPU * cpu, struct memory* mem, unsigned long long *cycles){
+static byte CPU_fetch_byte(struct CPU * cpu, struct memory* mem, unsigned long long *cycles){
 	if (cpu->PC >= 0 && cpu->PC < sizeof(mem->cell)){
 	byte inst = mem->cell[cpu->PC];
 	CPU_inc_program_counter(cpu, mem, cycles);
@@ -284,7 +284,7 @@ byte CPU_fetch_byte(struct CPU * cpu, struct memory* mem, unsigned long long *cy
 }
 
 /*Two machine cycles are used to fetch a word(16bits) from memory*/
-word CPU_fetch_word(struct CPU * cpu, struct memory* mem, unsigned long long *cycles){
+static word CPU_fetch_word(struct CPU * cpu, struct memory* mem, unsigned long long *cycles){
 	if (cpu->PC >= 0 && cpu->PC < sizeof(mem->cell)){	
 	word data = mem->cell[cpu->PC];		/*6502 is little endian so this is the least significant byte*/
 	CPU_inc_program_counter(cpu, mem, cycles);
@@ -298,7 +298,7 @@ word CPU_fetch_word(struct CPU * cpu, struct memory* mem, unsigned long long *cy
 	}
 }
 
-byte CPU_read_byte(struct CPU * cpu, struct memory* mem, word addr, unsigned long long *cycles){
+static byte CPU_read_byte(struct CPU * cpu, struct memory* mem, word addr, unsigned long long *cycles){
 	if (addr >= 0 && addr < sizeof(mem->cell)){
 	CPU_dec_cycles(cycles, 1);
 	byte data = mem->cell[addr];
@@ -309,13 +309,13 @@ byte CPU_read_byte(struct CPU * cpu, struct memory* mem, word addr, unsigned lon
 	}
 }
 
-void CPU_split_word(word value, byte *low, byte *high, unsigned long long *cycles){
+static void CPU_split_word(word value, byte *low, byte *high, unsigned long long *cycles){
 	CPU_dec_cycles(cycles, 1);
 	(*low) = ((value) & 0xFF);
 	(*high) = ((value) >> 8);
 }
 
-void CPU_combine_bytes(word *value, byte low, byte high, unsigned long long *cycles){
+static void CPU_combine_bytes(word *value, byte low, byte high, unsigned long long *cycles){
 	CPU_dec_cycles(cycles, 2);
 	(*value) = (high << 8);
 	(*value) |= low;
