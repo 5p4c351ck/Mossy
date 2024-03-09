@@ -14,7 +14,7 @@ int main(int argc, char *argv[]){
 
 	 FILE *file = fopen(argv[1], "rb");
     if (file == NULL) {
-        printf("Error opening file\n");
+        perror("Error opening file\n");
         return 1;
     }
 	
