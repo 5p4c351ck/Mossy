@@ -20,7 +20,7 @@ Run
 
 ```
 
-$ ./6502
+$ ./6502 <filename>
 ```
 
 **Note**: This project is currently under active development.
