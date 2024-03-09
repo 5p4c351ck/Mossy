@@ -24,13 +24,15 @@ struct CPU* CPU_power_on(void){
 }
 
 void CPU_power_off(struct CPU **cpu){
+	if (cpu != NULL){
 	free((*cpu));
 	(*cpu) = NULL;
 	return;
 }
+}
 
 void CPU_reset(struct CPU *cpu){
-
+	if (cpu != NULL){
 	cpu->PC = 0x00;
 	cpu->SP = 0xFF;
 
@@ -48,9 +50,10 @@ void CPU_reset(struct CPU *cpu){
 	
 	return;
 }
+}
 
 void CPU_state(struct CPU* cpu){
-
+	if (cpu != NULL){
 	printf("\t\t---CPU STATUS---\n");
 	printf("\t\tProgram counter: %d\n", cpu->PC);
 	printf("\t\tStack pointer: %d\n", cpu->SP);
@@ -65,9 +68,10 @@ void CPU_state(struct CPU* cpu){
 	printf("\t\tFlag V: %d\n", cpu->V);
 	printf("\t\tFlag N: %d\n", cpu->N);
 }
+}
 
 void CPU_exec(struct CPU * cpu, struct memory* mem, unsigned long long cycles){
-
+	if (cpu != NULL && mem != NULL){
 	while(cycles){
 		/*One machine cycle is always used to fetch the next instruction(byte) from memory*/
 		byte inst = CPU_fetch_byte(cpu, mem, &cycles);
@@ -267,12 +271,14 @@ void CPU_exec(struct CPU * cpu, struct memory* mem, unsigned long long cycles){
 		}
 	}
 }
+}
 
 /*The following bound checking is redundant since the program counter
   cannot be negative or higher than 65535 since its a word(unsigned short)
   but will be kept as is since it doesn't cause any problems to check*/
 
 static byte CPU_fetch_byte(struct CPU * cpu, struct memory* mem, unsigned long long *cycles){
+	if (cpu != NULL){
 	if (cpu->PC >= 0 && cpu->PC < sizeof(mem->cell)){
 	byte inst = mem->cell[cpu->PC];
 	CPU_inc_program_counter(cpu, mem, cycles);
@@ -282,9 +288,11 @@ static byte CPU_fetch_byte(struct CPU * cpu, struct memory* mem, unsigned long l
 		exit_and_save_status(cpu, OUTOFBOUNDSMEM);
 	}
 }
+}
 
 /*Two machine cycles are used to fetch a word(16bits) from memory*/
 static word CPU_fetch_word(struct CPU * cpu, struct memory* mem, unsigned long long *cycles){
+	if (cpu != NULL){
 	if (cpu->PC >= 0 && cpu->PC < sizeof(mem->cell)){	
 	word data = mem->cell[cpu->PC];		/*6502 is little endian so this is the least significant byte*/
 	CPU_inc_program_counter(cpu, mem, cycles);
@@ -297,8 +305,10 @@ static word CPU_fetch_word(struct CPU * cpu, struct memory* mem, unsigned long l
 		exit_and_save_status(cpu, OUTOFBOUNDSMEM);
 	}
 }
+}
 
 static byte CPU_read_byte(struct CPU * cpu, struct memory* mem, word addr, unsigned long long *cycles){
+	if (cpu != NULL){
 	if (addr >= 0 && addr < sizeof(mem->cell)){
 	CPU_dec_cycles(cycles, 1);
 	byte data = mem->cell[addr];
@@ -308,18 +318,23 @@ static byte CPU_read_byte(struct CPU * cpu, struct memory* mem, word addr, unsig
 		exit_and_save_status(cpu, OUTOFBOUNDSMEM);
 	}
 }
+}
 
 static void CPU_split_word(word value, byte *low, byte *high, unsigned long long *cycles){
+	if (low != NULL && high != NULL){
 	CPU_dec_cycles(cycles, 1);
 	(*low) = ((value) & 0xFF);
 	(*high) = ((value) >> 8);
 }
+}
 
 static void CPU_combine_bytes(word *value, byte low, byte high, unsigned long long *cycles){
+	if (value != NULL){
 	CPU_dec_cycles(cycles, 2);
 	(*value) = (high << 8);
 	(*value) |= low;
 
+}
 }
 
 static void CPU_set_flag_z(struct CPU *cpu, byte value){
@@ -347,6 +362,7 @@ static void CPU_set_flag_c_borrow(struct CPU *cpu, byte value){
 }
 
 static void CPU_set_flags(struct CPU *cpu, byte inst, byte value){
+	if (cpu != NULL){
 	if (inst == CPY_IM || inst == CPY_ZP || inst == CPY_AB){
 		byte result = cpu->Y - value;
 		CPU_set_flag_c_borrow(cpu, value);
@@ -388,8 +404,10 @@ static void CPU_set_flags(struct CPU *cpu, byte inst, byte value){
 		CPU_set_flag_z(cpu, value);
 	}
 }
+}
 
 static void CPU_operate_reg(struct CPU* cpu, byte *reg, enum operations oper, unsigned long long *cycles){
+	if (cpu != NULL){
 	if (reg != NULL){
     CPU_dec_cycles(cycles, 1);
     switch(oper){
@@ -410,6 +428,7 @@ static void CPU_operate_reg(struct CPU* cpu, byte *reg, enum operations oper, un
     else{
         exit_and_save_status(cpu, OUTOFBOUNDSMEM);
     }
+}
 }
 
 static void CPU_inc_program_counter(struct CPU* cpu, struct memory *mem, unsigned long long *cycles){
