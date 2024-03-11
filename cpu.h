@@ -6,7 +6,7 @@
 
 /*Instructions and opcodes*/
 
-/*						OPCODE			DESCTRIPTION					ADDRESSING	 	 BYTES		  CYCLES			*/
+/*	       OPCODE				   DESCTRIPTION				ADDRESSING	 	 BYTES		  CYCLES			*/
 
 
 
