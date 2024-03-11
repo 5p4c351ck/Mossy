@@ -77,6 +77,21 @@ void CPU_exec(struct CPU * cpu, struct memory* mem, unsigned long long cycles){
 		byte inst = CPU_fetch_byte(cpu, mem, &cycles);
 		switch (inst)
 		{
+		case CLC:
+			CPU_dec_cycles(&cycles, 1);
+			CPU_set_flags(cpu, inst, low);
+		break;
+		
+		case CLD:
+			CPU_dec_cycles(&cycles, 1);
+			CPU_set_flags(cpu, inst, low);
+		break;
+
+		case CLI:
+			CPU_dec_cycles(&cycles, 1);
+			CPU_set_flags(cpu, inst, low);
+		break;
+
 		case CLV:
 			CPU_dec_cycles(&cycles, 1);
 			CPU_set_flags(cpu, inst, low);
@@ -380,6 +395,15 @@ static void CPU_set_flags(struct CPU *cpu, byte inst, byte value){
 		CPU_set_flag_c_borrow(cpu, value);
 		CPU_set_flag_z(cpu, result);
 		CPU_set_flag_n(cpu, result);
+	}
+	else if (inst == CLC){
+		cpu->C ^= cpu->C;
+	}
+	else if (inst == CLD){
+		cpu->D ^= cpu->D;
+	}
+	else if (inst == CLI){
+		cpu->I ^= cpu->I;
 	}
 	else if (inst == CLV){
 		cpu->V ^= cpu->V;

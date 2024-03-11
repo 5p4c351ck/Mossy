@@ -8,6 +8,11 @@
 
 /*						OPCODE			DESCTRIPTION					ADDRESSING	 	 BYTES		  CYCLES			*/
 
+
+
+#define		CLC			0x18		/*Clear Carry Flag					Implied			1 bytes		2 cycles*/
+#define		CLD			0xD8		/*Clear Decimal Mode				Implied			1 bytes		2 cycles*/
+#define		CLI			0x58		/*Clear Interrupt Disable Bit		Implied			1 bytes		2 cycles*/
 #define		CLV			0xB8		/*Clear Overflow Flag				Implied			1 bytes		2 cycles*/
 #define		CMP_IM		0xC9		/*Compare Memory with Accumulator	Immediate		2 bytes		2 cycles*/
 #define		CMP_ZP		0xC5 		/*Compare Memory with Accumulator	Zero page		2 bytes		3 cycles*/
