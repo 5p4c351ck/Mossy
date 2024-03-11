@@ -10,6 +10,7 @@ static byte zp_addr;
 static word ab_addr;
 static byte low;
 static byte high;
+static sbyte offset;
 
 struct CPU* CPU_power_on(void){
 
@@ -77,6 +78,20 @@ void CPU_exec(struct CPU * cpu, struct memory* mem, unsigned long long cycles){
 		byte inst = CPU_fetch_byte(cpu, mem, &cycles);
 		switch (inst)
 		{
+		case BVS:
+			offset = CPU_fetch_byte(cpu, mem, &cycles);
+			if (cpu->V == 1){
+			high = cpu->PC >> 8;
+			cpu->PC = cpu->PC + offset;
+			if (high == (cpu->PC >> 8)){					/*If their high bytes are equal they are in the same page*/
+				CPU_dec_cycles(&cycles, 1);
+			}
+			else{
+				CPU_dec_cycles(&cycles, 2);
+			}
+			}
+		break;
+
 		case CLC:
 			CPU_dec_cycles(&cycles, 1);
 			CPU_set_flags(cpu, inst, low);

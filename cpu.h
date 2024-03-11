@@ -9,7 +9,7 @@
 /*	       OPCODE				   DESCTRIPTION				ADDRESSING	 	 BYTES		  CYCLES			*/
 
 
-
+#define	 	BVS		0x70		/*branch on V = 1			Relative		2 bytes		2 cycles  + 1 same page + 2 diff page */
 #define		CLC		0x18		/*Clear Carry Flag			Implied			1 bytes		2 cycles*/
 #define		CLD		0xD8		/*Clear Decimal Mode			Implied			1 bytes		2 cycles*/
 #define		CLI		0x58		/*Clear Interrupt Disable Bit		Implied			1 bytes		2 cycles*/
