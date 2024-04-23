@@ -80,20 +80,5 @@ extern void CPU_power_off(struct CPU **cpu);										/*Powers off the virtual C
 extern void CPU_reset(struct CPU *cpu);											/*Resets the state of the CPU*/
 extern void CPU_state(struct CPU* cpu);											/*Prints the state of the CPU*/
 extern void CPU_exec(struct CPU *cpu, struct memory *mem, unsigned long long cycles);					/*Starts executing instructions*/
-
-/*CPU API Internal subroutines(not to be called manually)*/
-
-static byte CPU_fetch_byte(struct CPU *cpu, struct memory *mem, unsigned long long *cycles);				/*Fetch instruction(8bits) from program counter address*/
-static word CPU_fetch_word(struct CPU *cpu, struct memory *mem, unsigned long long *cycles);				/*Fetch 16bits from program counter address*/
-static byte CPU_read_byte(struct CPU *cpu, struct memory *mem, word addr, unsigned long long *cycles); 			/*Read 8bits from memory address*/
-static void CPU_split_word(word value, byte *low, byte *high, unsigned long long *cycles);				/*Splits a word into two bytes*/
-static void CPU_combine_bytes(word *value, byte low, byte high, unsigned long long *cycles);				/*Combines two bytes into a word*/
-static void CPU_set_flag_z(struct CPU *cpu, byte value);								
-static void CPU_set_flag_n(struct CPU *cpu, byte value);	
-static void CPU_set_flag_c_carry(struct CPU *cpu, byte value);
-static void CPU_set_flag_c_borrow(struct CPU *cpu, byte value);
-static void CPU_set_flags(struct CPU *cpu, byte inst, byte value);
-static void CPU_operate_reg(struct CPU *cpu, byte *reg, enum operations oper, unsigned long long *cycles);
-static void CPU_inc_program_counter(struct CPU* cpu, struct memory *mem, unsigned long long *cycles);
 extern void CPU_dec_cycles(unsigned long long *cycles, unsigned short dec);
 #endif
